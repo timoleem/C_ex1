@@ -16,32 +16,21 @@ int main(int argc, char *argv[]) {
     }
 
     char *input = argv[1];
-
     struct stack *s = stack_init();
 
-    printf("%d", stack_pop(s));
+    int len = strlen(input);
+    int i = 0;
 
-    // int h = stack_push(s, 3);
-    // printf("%d", h);
-    // int top = stack_peek(s);
-    // printf("%d", top);
+    for (i=0; i<len; i++) {
+    	if (isdigit(input[i])) {
+    		stack_push(s, input[i]);
+    		printf("%c \n",input[i]);
+    	} 
+    }
 
-    // int len = strlen(input);
-    // int i = 0;
-    // char stack[len];
-
-    // for(i=0;i<len;i++) {
-    // 	if (isdigit(input[i])) {
-    // 		printf("%c",input[i]);
-    // 	} 
-    // }
-
-
-    
-
-    // ... SOME CODE MISSING HERE ...
-
-    // stack_cleanup(s);
+    printf("stats \n");
 
     return 0;
 }
+
+// $ gcc -o testncurses.o -lncurses testncurses.c

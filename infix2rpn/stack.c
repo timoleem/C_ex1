@@ -11,7 +11,7 @@ struct stack {
 struct stack *stack_init() {
     struct stack *s = malloc(sizeof(struct stack));
     s->stack_top = -1;
-    // Early exit with return alue 1 when stack is null pointer
+
     if (!s) {
         return NULL;
     }
@@ -67,3 +67,28 @@ int stack_empty(struct stack *s) {
         return 0;
     }
 }
+
+int size_stack(struct stack *s) {
+    return s->stack_top;
+}
+
+int GetOperatorWeight(char op) {
+    int weight = -1;
+    switch (op) {
+        case '+': 
+        case '-':
+            return 1;
+        case '*': 
+        case '/':
+            return 2;
+        case '^':
+            return 3;
+        case '(':
+        case ')':
+            return 4;
+    }
+}
+
+// int has_higher_precedence(char op1, char op2) {
+
+// }

@@ -28,3 +28,6 @@ int stack_peek(struct stack *stack);
 /* Return 1 if stack is empty, 0 if the stack contains any elements and
  * return -1 if the operation fails. */
 int stack_empty(struct stack *stack);
+
+/* Return the size of the stack as an integer */
+int size_stack(struct stack *stack); 

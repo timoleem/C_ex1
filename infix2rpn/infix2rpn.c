@@ -7,7 +7,16 @@
 
 #include "stack.h"
 
-// ... SOME CODE MISSING HERE ...
+int isoperator(char token) {
+	char operators[] = "+-*/^";
+	int len = strlen(operators);
+	int i = 0;
+	for (i = 0; i < len; i++) {
+		if (operators[i] == token) {
+			return 0;
+		}
+	}
+}
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
@@ -16,30 +25,85 @@ int main(int argc, char *argv[]) {
     }
 
     struct stack *s = stack_init();
-    struct stack *o = stack_init();
     char *input = argv[1];
-    int len = strlen(input);
-    int i = 0;
 
-    for (i=0; i<len; i++) {
-    	if (isdigit(input[i])) {
-    		stack_push(s, input[i]);
+	while (*input) {
+		if (isspace(*input)) {
+			*input++;
+		}
+    	if (isdigit(*input)) {
+    		putchar(*input);
     	}
-    	else {
-    		printf("%d ", GetOperatorWeight(input[i]));
-    		if (stack_empty(o)) {
-    			stack_push(o, input[i]);
-    		}
+    	if (isoperator(*input)) {
+    		while ()
+			stack_push(s, *input);
+			printf("YES");
     	}
-    }
-
-    for (i = size_stack(s); i >= 0; i--) {
-    	printf("%c ", stack_peek(s)); 
-    	stack_pop(s);	
+    	*input++;
 	}
 
-    // printf("stats \n");
-
-    return 0;
+	stack_cleanup(s);
+	return 0;
 }
+
+// while there are tokens to be read:
+//     read a token.
+//     if the token is a number, then:
+//         push it to the output queue.
+//     if the token is a function then:
+//         push it onto the operator stack 
+//     if the token is an operator, then:
+//         while ((there is a function at the top of the operator stack)
+//                or (there is an operator at the top of the operator stack with greater precedence)
+//                or (the operator at the top of the operator stack has equal precedence and is left associative))
+//               and (the operator at the top of the operator stack is not a left bracket):
+//             pop operators from the operator stack onto the output queue.
+//         push it onto the operator stack.
+//     if the token is a left bracket (i.e. "("), then:
+//         push it onto the operator stack.
+//     if the token is a right bracket (i.e. ")"), then:
+//         while the operator at the top of the operator stack is not a left bracket:
+//             pop the operator from the operator stack onto the output queue.
+//         pop the left bracket from the stack.
+//         /* if the stack runs out without finding a left bracket, then there are mismatched parentheses. */
+// if there are no more tokens to read:
+//     while there are still operator tokens on the stack:
+//         /* if the operator token on the top of the stack is a bracket, then there are mismatched parentheses. */
+//         pop the operator from the operator stack onto the output queue.
+// exit.
+
+//     for (i=0; i<len; i++) {
+//     	if (isdigit(input[i])) {
+//     		stack_push(s, input[i]);
+//     	}
+//     	else {
+//     		if (stack_empty(o)) {
+//     			stack_push(o, input[i]);
+//     		}
+//     		else {
+//     			if (has_higher_precedence( (char) stack_peek(o), input[i])) {
+//     				stack_push(s, (char) stack_peek(o));
+//     				stack_pop(o);
+//     				stack_push(o, input[i]);
+//     			}
+//     			else {
+//     				stack_push(o, input[i]);
+//     			}
+//     		}
+//     	}
+//     }
+
+//     for (i = size_stack(o); i >= 0; i--) {
+//     	printf("%d ", (char))
+//     	stack_pop(o);
+//     }
+
+//  //    for (i = size_stack(s); i >= 0; i--) {
+//  //    	printf("%c ", stack_peek(s)); 
+//  //    	stack_pop(s);	
+// 	// }
+
+// 	stack_cleanup(s);
+//     return 0;
+// }
 

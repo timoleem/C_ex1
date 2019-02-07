@@ -31,3 +31,9 @@ int stack_empty(struct stack *stack);
 
 /* Return the size of the stack as an integer */
 int size_stack(struct stack *stack); 
+
+/* Get the operator weight of one character */
+int GetOperatorWeight(char op);
+
+/* Check which operator has a higher precedence. If op1 */
+int has_higher_precedence(char op1, char op2);

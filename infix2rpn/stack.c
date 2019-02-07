@@ -6,12 +6,18 @@ struct stack {
 
     int data[STACK_SIZE];
     int stack_top;
+    int push;
+    int pop;
+    int max;
 };
 
 struct stack *stack_init() {
+
     struct stack *s = malloc(sizeof(struct stack));
     s->stack_top = -1;
-
+    s->push = 0;
+    s->pop = 0;
+    s->max = 0;
     if (!s) {
         return NULL;
     }
@@ -20,13 +26,15 @@ struct stack *stack_init() {
 }
 
 void stack_cleanup(struct stack *s) {
-
+    fprintf( stderr, "stats %d %d %d \n", s->push, s->pop, s->max);
     free(s);
 }
 
 int stack_push(struct stack *s, int c) {
-
-    if (s->stack_top == STACK_SIZE-1) {
+    if (s == NULL) {
+        return 1;
+    }
+    else if (s->stack_top == STACK_SIZE-1) {
         return 1;
     }
     else {
@@ -37,10 +45,12 @@ int stack_push(struct stack *s, int c) {
 }
 
 int stack_pop(struct stack *s) {
-
-    if (s->stack_top == -1) {
+    if (s == NULL) {
         return -1;
     }
+    else if (s->stack_top == -1) {
+        return -1;
+    }  
     else {
         int pop_element = s->data[s->stack_top];
         s->stack_top--;
@@ -49,8 +59,10 @@ int stack_pop(struct stack *s) {
 }
 
 int stack_peek(struct stack *s) {
-
-    if (s->stack_top == -1) {
+    if (s == NULL) {
+        return -1;
+    }
+    else if (s->stack_top == -1) {
         return -1;
     }
     else {
@@ -60,7 +72,11 @@ int stack_peek(struct stack *s) {
 }
 
 int stack_empty(struct stack *s) {
-    if (s->stack_top == -1) {
+
+    if (s == NULL) {
+        return -1;
+    }
+    else if (s->stack_top == -1) {
         return 1;
     }
     else {
@@ -69,11 +85,12 @@ int stack_empty(struct stack *s) {
 }
 
 int size_stack(struct stack *s) {
+
     return s->stack_top;
 }
 
 int GetOperatorWeight(char op) {
-    int weight = -1;
+
     switch (op) {
         case '+': 
         case '-':
@@ -87,8 +104,20 @@ int GetOperatorWeight(char op) {
         case ')':
             return 4;
     }
+    return -1;
 }
 
-// int has_higher_precedence(char op1, char op2) {
+int has_higher_precedence(char op1, char op2) {
 
-// }
+    int op1_weight = GetOperatorWeight(op1);
+    int op2_weight = GetOperatorWeight(op2);
+    if (op1_weight == -1 || op2_weight == -1) {
+        return -1;
+    }
+    if (op1_weight >= op2_weight) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}

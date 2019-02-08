@@ -17,6 +17,10 @@ int main(int argc, char *argv[]) {
     char *input = argv[1];
 
 	while (*input) {
+		if ((char) *input == 'a' || (char) *input == 'b' ||
+			(char) *input == 'c' || (char) *input == 'd' ){
+			return 1;
+		}
 		if (isspace(*input)) {
 			input++;
 		}
@@ -29,7 +33,7 @@ int main(int argc, char *argv[]) {
     		}
     		putchar(' ');    		
     	}
-    	if (!isoperator(*input)) {
+    	if (isoperator(*input)) {
     		while (
     			((!stack_empty(s) && has_higher_precedence((char) stack_peek(s), *input)) 
 
@@ -40,13 +44,14 @@ int main(int argc, char *argv[]) {
     				&&
 
     			(!stack_empty(s) && left_bracket((char) stack_peek(s)))) 
-
     		{
     			putchar(stack_peek(s));
     			putchar(' ');
+    			add_pop(s);
     			stack_pop(s);
-    		}
 
+    		}
+    		add_push(s);
     		stack_push(s, *input);
 			
     	}
@@ -70,6 +75,7 @@ int main(int argc, char *argv[]) {
 	while (!stack_empty(s)) {
 		putchar(stack_peek(s));
 		putchar(' ');
+		add_pop(s);
 		stack_pop(s);
 	}
 

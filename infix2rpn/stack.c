@@ -22,8 +22,15 @@ struct stack *stack_init() {
     if (!s) {
         return NULL;
     }
-
     return s;
+}
+
+void add_push(struct stack *s) {
+    s->push = s->push + 1;
+}
+
+void add_pop(struct stack *s) {
+    s->pop = s->pop +1;
 }
 
 void stack_cleanup(struct stack *s) {
@@ -91,21 +98,24 @@ int size_stack(struct stack *s) {
 }
 
 int GetOperatorWeight(char op) {
-
+    int weight = 0;
     switch (op) {
         case '+': 
         case '-':
-            return 1;
+            weight = 1;
+            break;
         case '*': 
         case '/':
-            return 2;
+            weight = 2;
+            break;
         case '^':
-            return 3;
+            weight = 3;
+            break; 
         case '(':
         case ')':
-            return 4;
-    }
-    return -1;
+            weight = 4;
+            break;     }
+    return weight;
 }
 
 int has_higher_precedence(char op1, char op2) {
@@ -116,22 +126,23 @@ int has_higher_precedence(char op1, char op2) {
         return 1;
     }
     if (op1_weight > op2_weight) {
-        return 0;
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 int has_equal_precedence(char op1, char op2) {
 
     int op1_weight = GetOperatorWeight(op1);
     int op2_weight = GetOperatorWeight(op2);
+
     if (op1_weight == -1 || op2_weight == -1) {
         return 1;
     }
     if (op1_weight == op2_weight) {
-        return 0;
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 int isoperator(char token) {
@@ -140,10 +151,10 @@ int isoperator(char token) {
     int i = 0;
     for (i = 0; i < (int) len; i++) {
         if (token == operators[i]) {
-            return 0;
+            return 1;
         }
     }
-    return 1;
+    return 0;
 }
 
 int left_bracket (char token) {
@@ -164,4 +175,16 @@ int right_bracket (char token) {
     else {
         return 1;
     }
+}
+
+int isinvalidtoken(char token) {
+    char operators[] = "+-*/^)( ";
+    size_t len = strlen(operators);
+    int i = 0;
+    for (i = 0; i < (int) len; i++) {
+        if (token == operators[i]) {
+            return 1;
+        }
+    }
+    return 0;
 }

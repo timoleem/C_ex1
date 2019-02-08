@@ -4,6 +4,7 @@ struct stack;
 /* Expose stack size in header file for testing. */
 #define STACK_SIZE 100
 
+
 /* Return a pointer to a stack data structure if succesful, otherwise
  * return NULL.
  * Size of stack is fixed. */
@@ -49,3 +50,12 @@ int left_bracket (char token);
 
 /* Check if token is not a right bracket */
 int right_bracket (char token);
+
+/* Check if token is valid */
+int isinvalidtoken(char token);
+
+/* Add push */
+void add_push(struct stack *stack); 
+
+// /* Add pop */
+void add_pop(struct stack *s); 

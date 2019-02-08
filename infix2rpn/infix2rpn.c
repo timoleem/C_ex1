@@ -21,38 +21,58 @@ int main(int argc, char *argv[]) {
 			input++;
 		}
     	if (isdigit(*input)) {
-    		putchar(*input);
+    		putchar(*input);    		
+    		input++;
+    		while (isdigit(*input)) {
+    			putchar(*input);
+    			input++;
+    		}
+    		putchar(' ');    		
     	}
-    	if (isoperator(*input)) {
+    	if (!isoperator(*input)) {
+    		while (
+    			((!stack_empty(s) && has_higher_precedence((char) stack_peek(s), *input)) 
 
-    		if (!stack_empty(s)) {
-    			stack_push(s, *input);
-    		}
-    		else if (has_higher_precedence((char) stack_peek(s), *input)) {
-    			stack_push(s, *input);
-    		}
-    		else if (has_equal_precedence((char) stack_peek(s), *input)) {
-    			stack_push(s, *input);
-    		}
-    		else if (no_left_bracket(stack_peek(s))) {
-    			stack_push(s, *input);
-    		}
-    		putchar(stack_peek(s));
+    				||
 
-    		// while ((!stack_empty(s) || 
-    		// 		has_higher_precedence((char) stack_peek(s), *input)) ||
-    		// 		has_equal_precedence((char) stack_peek(s), *input) &&
-    		// 		no_left_bracket(stack_peek(s))) {
-    		// 	putchar(stack_peek(s));
-    		// 	stack_pop(s);
-    		// }
-			stack_push(s, *input);
-    	}
-    	if (!no_left_bracket(*input)) {
+    			(!stack_empty(s) && has_equal_precedence((char) stack_peek(s), *input))) 
+
+    				&&
+
+    			(!stack_empty(s) && left_bracket((char) stack_peek(s)))) 
+
+    		{
+    			putchar(stack_peek(s));
+    			putchar(' ');
+    			stack_pop(s);
+    		}
+
     		stack_push(s, *input);
+			
+    	}
+    	if (left_bracket(*input)) {
+    		stack_push(s, *input);
+    	}
+    	if (right_bracket(*input)) {
+    		// check if left bracket in stack
+    		while (!left_bracket((char) stack_peek(s))) {
+    			// print and pop the operators in stack
+    			putchar(stack_peek(s));	
+    			putchar(' ');
+    			stack_pop(s);
+    		}
+/* if the stack runs out without finding a left bracket, then there are mismatched parentheses. */
+    		// pop the left bracket
+    		stack_pop(s);
     	}
     	input++;
 	}
+	while (!stack_empty(s)) {
+		putchar(stack_peek(s));
+		putchar(' ');
+		stack_pop(s);
+	}
+
 	stack_cleanup(s);
 	return 0;
 }

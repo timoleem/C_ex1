@@ -118,6 +118,7 @@ int has_higher_precedence(char op1, char op2) {
     if (op1_weight > op2_weight) {
         return 0;
     }
+    return 1;
 }
 
 int has_equal_precedence(char op1, char op2) {
@@ -130,22 +131,34 @@ int has_equal_precedence(char op1, char op2) {
     if (op1_weight == op2_weight) {
         return 0;
     }
+    return 1;
 }
 
 int isoperator(char token) {
     char operators[] = "+-*/^";
     size_t len = strlen(operators);
     int i = 0;
-    for (i = 0; i < (int)len; i++) {
-        if (operators[i] == token) {
+    for (i = 0; i < (int) len; i++) {
+        if (token == operators[i]) {
             return 0;
         }
     }
     return 1;
 }
 
-int no_left_bracket (char token) {
-    if (token == ")") {
+int left_bracket (char token) {
+
+    if (token == '(') {
+        return 0;
+    }
+    else {
+        return 1;
+    }
+}
+
+int right_bracket (char token) {
+
+    if (token == ')') {
         return 0;
     }
     else {

@@ -45,5 +45,7 @@ int isoperator(char token);
 int has_equal_precedence(char op1, char op2);
 
 /* Check if token is not a left bracket */
-int no_left_bracket (char token);
+int left_bracket (char token);
 
+/* Check if token is not a right bracket */
+int right_bracket (char token);

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "stack.h"
+#include <string.h>
 
 struct stack {
 
@@ -112,12 +113,42 @@ int has_higher_precedence(char op1, char op2) {
     int op1_weight = GetOperatorWeight(op1);
     int op2_weight = GetOperatorWeight(op2);
     if (op1_weight == -1 || op2_weight == -1) {
-        return -1;
-    }
-    if (op1_weight >= op2_weight) {
         return 1;
     }
-    else {
+    if (op1_weight > op2_weight) {
         return 0;
+    }
+}
+
+int has_equal_precedence(char op1, char op2) {
+
+    int op1_weight = GetOperatorWeight(op1);
+    int op2_weight = GetOperatorWeight(op2);
+    if (op1_weight == -1 || op2_weight == -1) {
+        return 1;
+    }
+    if (op1_weight == op2_weight) {
+        return 0;
+    }
+}
+
+int isoperator(char token) {
+    char operators[] = "+-*/^";
+    size_t len = strlen(operators);
+    int i = 0;
+    for (i = 0; i < (int)len; i++) {
+        if (operators[i] == token) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int no_left_bracket (char token) {
+    if (token == ")") {
+        return 0;
+    }
+    else {
+        return 1;
     }
 }

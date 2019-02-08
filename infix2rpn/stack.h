@@ -35,5 +35,15 @@ int size_stack(struct stack *stack);
 /* Get the operator weight of one character */
 int GetOperatorWeight(char op);
 
-/* Check which operator has a higher precedence. If op1 */
+/* Check which operator has a higher precedence */
 int has_higher_precedence(char op1, char op2);
+
+/* Check if the token is a operator */
+int isoperator(char token);
+
+/* Check which operator has equal precedence */
+int has_equal_precedence(char op1, char op2);
+
+/* Check if token is not a left bracket */
+int no_left_bracket (char token);
+

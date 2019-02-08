@@ -7,17 +7,6 @@
 
 #include "stack.h"
 
-int isoperator(char token) {
-	char operators[] = "+-*/^";
-	int len = strlen(operators);
-	int i = 0;
-	for (i = 0; i < len; i++) {
-		if (operators[i] == token) {
-			return 0;
-		}
-	}
-}
-
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         printf("usage: %s \"infix_expr\"\n", argv[0]);
@@ -29,19 +18,41 @@ int main(int argc, char *argv[]) {
 
 	while (*input) {
 		if (isspace(*input)) {
-			*input++;
+			input++;
 		}
     	if (isdigit(*input)) {
     		putchar(*input);
     	}
     	if (isoperator(*input)) {
-    		while ()
-			stack_push(s, *input);
-			printf("YES");
-    	}
-    	*input++;
-	}
 
+    		if (!stack_empty(s)) {
+    			stack_push(s, *input);
+    		}
+    		else if (has_higher_precedence((char) stack_peek(s), *input)) {
+    			stack_push(s, *input);
+    		}
+    		else if (has_equal_precedence((char) stack_peek(s), *input)) {
+    			stack_push(s, *input);
+    		}
+    		else if (no_left_bracket(stack_peek(s))) {
+    			stack_push(s, *input);
+    		}
+    		putchar(stack_peek(s));
+
+    		// while ((!stack_empty(s) || 
+    		// 		has_higher_precedence((char) stack_peek(s), *input)) ||
+    		// 		has_equal_precedence((char) stack_peek(s), *input) &&
+    		// 		no_left_bracket(stack_peek(s))) {
+    		// 	putchar(stack_peek(s));
+    		// 	stack_pop(s);
+    		// }
+			stack_push(s, *input);
+    	}
+    	if (!no_left_bracket(*input)) {
+    		stack_push(s, *input);
+    	}
+    	input++;
+	}
 	stack_cleanup(s);
 	return 0;
 }

@@ -10,6 +10,7 @@ struct stack {
     int push;
     int pop;
     int max;
+    int max_dynamic;
 };
 
 struct stack *stack_init() {
@@ -19,6 +20,8 @@ struct stack *stack_init() {
     s->push = 0;
     s->pop = 0;
     s->max = 0;
+    s->max_dynamic = 0;
+
     if (!s) {
         return NULL;
     }
@@ -26,11 +29,30 @@ struct stack *stack_init() {
 }
 
 void add_push(struct stack *s) {
+    
     s->push = s->push + 1;
 }
 
 void add_pop(struct stack *s) {
+
     s->pop = s->pop +1;
+}
+
+void add_max(struct stack *s, int c) {
+    
+    if (c == 1) {
+        s->max_dynamic = s->max_dynamic + 1;   
+    }
+    else if (c == 0) {
+        s->max_dynamic = s->max_dynamic - 1;
+    }
+}
+
+void max(struct stack *s) {
+    if (s->max < s->max_dynamic) {
+        printf(" %d", s->max);
+        s->max = s->max_dynamic;
+    }
 }
 
 void stack_cleanup(struct stack *s) {
@@ -113,7 +135,7 @@ int GetOperatorWeight(char op) {
             break; 
         case '(':
         case ')':
-            weight = 4;
+            weight = 0;
             break;     }
     return weight;
 }
@@ -160,20 +182,20 @@ int isoperator(char token) {
 int left_bracket (char token) {
 
     if (token == '(') {
-        return 0;
+        return 1;
     }
     else {
-        return 1;
+        return 0;
     }
 }
 
 int right_bracket (char token) {
 
     if (token == ')') {
-        return 0;
+        return 1;
     }
     else {
-        return 1;
+        return 0;
     }
 }
 
@@ -183,8 +205,8 @@ int isinvalidtoken(char token) {
     int i = 0;
     for (i = 0; i < (int) len; i++) {
         if (token == operators[i]) {
-            return 1;
+            return 0;
         }
     }
-    return 0;
+    return 1;
 }

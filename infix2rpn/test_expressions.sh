@@ -23,6 +23,11 @@ echo ''
 ./infix2rpn "blabla" > /dev/null 2>&1; echo $?
 echo ''
 
+./infix2rpn "3^3*(4-2)" 
+echo ''
+
+./infix2rpn "3^3*4-2)" 
+echo ''
 
 ## Add your own tests here
 

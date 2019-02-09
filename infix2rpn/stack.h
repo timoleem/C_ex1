@@ -57,5 +57,11 @@ int isinvalidtoken(char token);
 /* Add push */
 void add_push(struct stack *stack); 
 
-// /* Add pop */
-void add_pop(struct stack *s); 
+/* Add pop */
+void add_pop(struct stack *stack); 
+
+/* Add max to dynamic int */
+void add_max(struct stack *stack, int c);
+
+/* Keep track of max stack length value */
+void max(struct stack *stack);

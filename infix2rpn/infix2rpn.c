@@ -4,8 +4,13 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-
 #include "stack.h"
+
+size_t strlen(char * s) {
+    char *p = s;
+    for (; *p != '\0'; p++);
+    return p - s;
+}
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
@@ -15,8 +20,12 @@ int main(int argc, char *argv[]) {
 
     struct stack *s = stack_init();
     char *input = argv[1];
-
+    printf("%d \n ", )
 	while (*input) {
+		// if ((*input >= 'A' && *input <= 'Z') || 
+		// 	(*input >= 'a' && *input <= 'z')) {
+		// 	return 1;
+		// }
 		if (isspace(*input)) {
 			input++;
 		}

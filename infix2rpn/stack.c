@@ -50,7 +50,6 @@ void add_max(struct stack *s, int c) {
 
 void max(struct stack *s) {
     if (s->max < s->max_dynamic) {
-        printf(" %d", s->max);
         s->max = s->max_dynamic;
     }
 }

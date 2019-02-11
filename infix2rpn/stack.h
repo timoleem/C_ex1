@@ -52,7 +52,7 @@ int left_bracket (char token);
 int right_bracket (char token);
 
 /* Check if token is valid */
-int isinvalidtoken(char token);
+int isvalidtoken(char token);
 
 /* Add push */
 void add_push(struct stack *stack); 
@@ -65,3 +65,6 @@ void add_max(struct stack *stack, int c);
 
 /* Keep track of max stack length value */
 void max(struct stack *stack);
+
+/* Check for left associativity */
+int is_left_associate(char token);

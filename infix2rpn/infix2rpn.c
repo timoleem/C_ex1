@@ -6,12 +6,6 @@
 #include <string.h>
 #include "stack.h"
 
-size_t strlen(char * s) {
-    char *p = s;
-    for (; *p != '\0'; p++);
-    return p - s;
-}
-
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         printf("usage: %s \"infix_expr\"\n", argv[0]);
@@ -20,12 +14,14 @@ int main(int argc, char *argv[]) {
 
     struct stack *s = stack_init();
     char *input = argv[1];
-    printf("%d \n ", )
+
 	while (*input) {
-		// if ((*input >= 'A' && *input <= 'Z') || 
-		// 	(*input >= 'a' && *input <= 'z')) {
-		// 	return 1;
-		// }
+		if (!isdigit(*input) && !isoperator(*input) && 
+			!left_bracket(*input) & !right_bracket(*input) && 
+			!isspace(*input) && !isvalidtoken(*input)) {
+			stack_cleanup(s);
+			return 1;
+		}
 		if (isspace(*input)) {
 			input++;
 		}
@@ -40,11 +36,11 @@ int main(int argc, char *argv[]) {
     	}
     	if (isoperator(*input)) {
     		while (
-    			((!stack_empty(s) 
-    			&& has_higher_precedence((char) stack_peek(s), *input)) 
-    			|| (!stack_empty(s) 
-    			&& has_equal_precedence((char) stack_peek(s), *input))) 
-    			&& (!stack_empty(s) && !left_bracket((char) stack_peek(s)))) {
+    			((!stack_empty(s) && 
+    			has_higher_precedence((char) stack_peek(s), *input)) || 
+    			(!stack_empty(s) && 
+    			has_equal_precedence((char) stack_peek(s), *input))) && 
+    			(!stack_empty(s) && !left_bracket((char) stack_peek(s)))) {
     			putchar(stack_peek(s));
     			putchar(' ');
     			add_pop(s);
@@ -74,7 +70,8 @@ int main(int argc, char *argv[]) {
     			// if there is no left bracket, return error
     			if (stack_empty(s)) {
     				printf("Error : Mismatched parentheses");
-    				break;
+    				stack_cleanup(s);
+    				return 1;
     			}
     		}
     		// pop the left bracket
@@ -87,6 +84,11 @@ int main(int argc, char *argv[]) {
     	input++;
 	}
 	while (!stack_empty(s)) {
+		if (left_bracket((char) stack_peek(s))) {
+			printf("Error : Mismatched parentheses");
+			stack_cleanup(s);
+			return 1;			
+		}		
 		putchar(stack_peek(s));
 		putchar(' ');
 		add_max(s, 0);

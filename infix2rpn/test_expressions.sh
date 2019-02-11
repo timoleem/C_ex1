@@ -29,6 +29,15 @@ echo ''
 ./infix2rpn "3^3*4-2)" 
 echo ''
 
+./infix2rpn "3^3(*4-2" 
+echo ''
+
+./infix2rpn "3(((^3*4-(2" 
+echo ''
+
+./infix2rpn "2*2^3^4" 
+echo ''
+
 ## Add your own tests here
 
 # TODO

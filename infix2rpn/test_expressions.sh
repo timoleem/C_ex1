@@ -4,7 +4,10 @@
 ## The tests suggested in the assignment text are reproduced below
 
 # Conversion output
-./infix2rpn "3+2"
+./infix2rpn "~3+2"
+echo ''
+
+./infix2rpn "~(3+2)"
 echo ''
 
 # Exit status in case of success
@@ -38,7 +41,7 @@ echo ''
 ./infix2rpn "3^3*4-2)" 
 echo ''
 
-./infix2rpn "3^3(*4-2" 
+./infix2rpn "3^3((*4)-2" 
 echo ''
 
 ./infix2rpn "3(((^3*4-(2" 

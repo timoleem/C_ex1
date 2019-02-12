@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 
 	while (*input) {
 		if (!isdigit(*input) && !isoperator(*input) && 
-			!left_bracket(*input) & !right_bracket(*input) && 
+			!left_bracket(*input) && !right_bracket(*input) && 
 			!isspace(*input) && !isvalidtoken(*input)) {
 			stack_cleanup(s);
 			return 1;
@@ -26,13 +26,13 @@ int main(int argc, char *argv[]) {
 			input++;
 		}
     	if (isdigit(*input)) {
-    		putchar(*input);    		
+    		putchar(*input);  
     		input++;
     		while (isdigit(*input)) {
     			putchar(*input);
     			input++;
-    		}
-    		putchar(' ');    		
+	    	}   
+    		putchar(' ');
     	}
     	if (isoperator(*input)) {
     		while (
@@ -51,12 +51,14 @@ int main(int argc, char *argv[]) {
     		add_max(s, 1);
     		stack_push(s, *input);
     		max(s);
+    		input++;
     	}
     	if (left_bracket(*input)) {
     		add_max(s, 1);
     		add_push(s);
     		stack_push(s, *input);
     		max(s);
+    		input++;
     	}
     	if (right_bracket(*input)) {
     		// check if left bracket in stack
@@ -80,8 +82,8 @@ int main(int argc, char *argv[]) {
     			add_max(s, 0);
         		stack_pop(s);			
     		}
+    		input++;
     	}
-    	input++;
 	}
 	while (!stack_empty(s)) {
 		if (left_bracket((char) stack_peek(s))) {
@@ -95,7 +97,6 @@ int main(int argc, char *argv[]) {
 		add_pop(s);
 		stack_pop(s);
 	}
-
 	stack_cleanup(s);
 	return 0;
 }

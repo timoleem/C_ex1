@@ -51,8 +51,10 @@ int main(int argc, char *argv[]) {
 
     // SOME CODE MISSING HERE
     
-    printf("%d", argc);
-    printf("%d", argv);
+    char *input = argv[1];
+
+    printf("%s", input);
+    // printf("%d", argv);
 
     while (fgets(buf, BUF_SIZE, stdin)) {
     

@@ -33,6 +33,8 @@ void stack_cleanup(struct stack *s) {
     free(s);
 }
 
+/* Push operator to the stack if not the max size is exceeded AND 
+   stack is not NULL */
 int stack_push(struct stack *s, int c) {
     if (s == NULL) {
         return 1;
@@ -45,6 +47,8 @@ int stack_push(struct stack *s, int c) {
         s->push++; 
         s->data[s->stack_top] = c;
         s->max_dynamic++;
+        /* Every time a operator is added to the stacksize, check if it has
+        exceeded the mac value of the stack size. */
         if (s->max < s->max_dynamic) {
             s->max = s->max_dynamic;
         }
@@ -52,6 +56,8 @@ int stack_push(struct stack *s, int c) {
     }
 }
 
+/* Pop operator off the stack if stack is not empty AND 
+   stack is not NULL */
 int stack_pop(struct stack *s) {
     if (s == NULL) {
         return -1;
@@ -59,15 +65,18 @@ int stack_pop(struct stack *s) {
     else if (s->stack_top == -1) {
         return -1;
     }  
+    // Keep track of the dynamic size of the stack and pop operator
     else {
-        int pop_element = s->data[s->stack_top];
+        int pop_operator = s->data[s->stack_top];
         s->stack_top--;
         s->pop++;
         s->max_dynamic--;
-        return pop_element;
+        return pop_operator;
     }
 }
 
+/* Peek operator from the stack if stack is not empty AND 
+   stack is not NULL */
 int stack_peek(struct stack *s) {
     if (s == NULL) {
         return -1;
@@ -76,11 +85,12 @@ int stack_peek(struct stack *s) {
         return -1;
     }
     else {
-        int pop_element = s->data[s->stack_top];
-        return pop_element;
+        int pop_operator = s->data[s->stack_top];
+        return pop_operator;
     }
 }
 
+/* Empty stack if stack is not empty AND stack is not NULL */
 int stack_empty(struct stack *s) {
 
     if (s == NULL) {

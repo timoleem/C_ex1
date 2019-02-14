@@ -6,6 +6,7 @@
 #include <string.h>
 #include "stack.h"
 
+// Assign operator weight to the operators and return this value
 int GetOperatorWeight(char op) {
     int weight = 0;
     switch (op) {
@@ -28,6 +29,7 @@ int GetOperatorWeight(char op) {
     return weight;
 }
 
+// Check if the new operator has a higher precedence
 int has_higher_precedence(char op1, char op2) {
 
     int op1_weight = GetOperatorWeight(op1);
@@ -41,6 +43,7 @@ int has_higher_precedence(char op1, char op2) {
     return 0;
 }
 
+// Check if both operators have an equal precedence
 int has_equal_precedence(char op1, char op2) {
 
     int op1_weight = GetOperatorWeight(op1);
@@ -55,7 +58,9 @@ int has_equal_precedence(char op1, char op2) {
     return 0;
 }
 
+// Check if the new operator is left associative
 int is_left_associate(char token) {
+	// Return zero if it is either ^ or ~
     if (token == '^' || token == '~') {
         return 0;
     }
@@ -64,6 +69,7 @@ int is_left_associate(char token) {
     }
 }
 
+// Check if the token is an operator or not
 int isoperator(char token) {
     char operators[] = "+-*/^~";
     size_t len = strlen(operators);
@@ -76,6 +82,7 @@ int isoperator(char token) {
     return 0;
 }
 
+// Check if the token is a left bracket
 int left_bracket (char token) {
 
     if (token == '(') {
@@ -86,6 +93,7 @@ int left_bracket (char token) {
     }
 }
 
+// Check if the token is a right bracket
 int right_bracket (char token) {
 
     if (token == ')') {
@@ -96,6 +104,7 @@ int right_bracket (char token) {
     }
 }
 
+// This is an extra check that I had to implement to make it work
 int isvalidtoken(char token) {
     char operators[] = "CLUTTER_IM_MODULE=xim";
     size_t len = strlen(operators);
@@ -108,6 +117,7 @@ int isvalidtoken(char token) {
     return 0;
 }
 
+// Main code for RPN 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         printf("usage: %s \"infix_expr\"\n", argv[0]);
@@ -118,6 +128,7 @@ int main(int argc, char *argv[]) {
     char *input = argv[1];
 
 	while (*input) {
+		// Check if there is a valid token. Else return 1
 		if (!isdigit(*input) && !isoperator(*input) && 
 			!left_bracket(*input) && !right_bracket(*input) && 
 			!isspace(*input) && !isvalidtoken(*input)) {
@@ -125,37 +136,47 @@ int main(int argc, char *argv[]) {
 			putchar('\n');
 			return 1;
 		}
+		// Check if there is a space, if so increment input
 		if (isspace(*input)) {
 			input++;
 		}
+		// Check if there is a digit
     	if (isdigit(*input)) {
     		putchar(*input);  
     		input++;
+    		// In case the digit is higher then 9
     		while (isdigit(*input)) {
     			putchar(*input);
     			input++;
 	    	}   
     		putchar(' ');
     	}
+    	// Check if there is a operator
     	if (isoperator(*input)) {
-    		while (
-    			((!stack_empty(s) && 
-    			has_higher_precedence((char) stack_peek(s), *input)) || 
-    			(!stack_empty(s) && 
-    			has_equal_precedence((char) stack_peek(s), *input) &&
-    			is_left_associate(*input))) && 
-    			(!stack_empty(s) && !left_bracket((char) stack_peek(s)))) {
+    		/* If stack is NOT empty AND the new operator has higher precedence
+    		   OR (new operator has equal precedence AND is left associative) 
+    		   AND the new operator is NOT a left bracket. Then pop operator 
+    		   from the stack and add it to the output queue */
+    		while (((!stack_empty(s) && 
+    				has_higher_precedence((char) stack_peek(s), *input)) || 
+    				(!stack_empty(s) && 
+    				has_equal_precedence((char) stack_peek(s), *input) &&
+    				is_left_associate(*input))) && 
+    				(!stack_empty(s) && !left_bracket((char) stack_peek(s)))) {
     			putchar(stack_peek(s));
     			putchar(' ');
     			stack_pop(s);
     		}
+    		// Else push operator to the stack.
     		stack_push(s, *input);
     		input++;
     	}
+    	// Check if token is a left bracket
     	if (left_bracket(*input)) {
     		stack_push(s, *input);
     		input++;
     	}
+    	// Check if token is a right bracket
     	if (right_bracket(*input)) {
     		// check if left bracket in stack
     		while (!left_bracket((char) stack_peek(s))) {
@@ -170,14 +191,16 @@ int main(int argc, char *argv[]) {
     				return 1;
     			}
     		}
-    		// pop the left bracket
+    		// pop the left bracket (do not add it to the output queue)
     		if (!stack_empty(s)) {
         		stack_pop(s);			
     		}
     		input++;
     	}
 	}
+	// Add existing operators in the stack if there are any
 	while (!stack_empty(s)) {
+		// If there is a left bracket left, return error
 		if (left_bracket((char) stack_peek(s))) {
 			stack_cleanup(s);
 			putchar('\n');
@@ -187,8 +210,8 @@ int main(int argc, char *argv[]) {
 		putchar(' ');
 		stack_pop(s);
 	}
+	// Clean-up stack and return valid check
 	stack_cleanup(s);
 	putchar('\n');
 	return 0;
 }
-

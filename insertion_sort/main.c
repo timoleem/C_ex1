@@ -53,6 +53,8 @@ int main(int argc, char *argv[]) {
     
     char *input = argv[1];
 
+    struct node* n = list_new_node(*input);
+
     printf("%s", input);
     // printf("%d", argv);
 

@@ -72,8 +72,8 @@ END_TEST
 START_TEST (test_add_back)
 {
     struct list* l = list_init();
-    
     struct node* n = list_new_node(5);
+
     ck_assert_ptr_nonnull(n);  
     ck_assert_int_eq(list_add_back(l, n), 0);
     

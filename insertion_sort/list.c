@@ -121,27 +121,26 @@ struct node* list_prev(struct list* l, struct node* n) {
 /* Appends node N at the back of list L.
  * Returns 0 if N was succesfully appended, 1 otherwise. */
 int list_add_back(struct list* l, struct node* n) {
-    // ;
-    if(!l) {
-    	return NULL;
-    }
-    struct node *last = l->head; 
-    while (last->next != NULL) { 
 
-        last = last->next; 
-    } 
-    last->next = n;
-    if (!last->next) {
+	if (!l || !n) {
 		return 1;
 	}
+	if (!list_head(l)) {
+        // make if the head and tail if list has no elements
+        l->head = n;
+    }
+    struct node *last = list_tail(l); 
+    last->next = n;
     return 0;    
 }
+
+
 
 /* Returns the value stored in the list node N, or 0 if N is the NULL
  * pointer. */
 int list_node_value(struct node* n) {
 
-	if (n != NULL) {
+	if (n) {
 		return n->val;
 	}
 	return 0;
@@ -151,40 +150,140 @@ int list_node_value(struct node* n) {
  * to the node N and N contains no pointers to nodes in L.
  * Returns 0 if N was succesfully unlinked from list L, or 1 otherwise */
 int list_unlink_node(struct list* l, struct node* n) {
-    ;
+
+    struct node *last = l->head; 
+    struct node *prev;
+    while (last != n) { 
+    	prev = last;
+        last = last->next; 
+    } 
+    prev->next = last->next;
+    last->next = NULL;
+    return 0;    
 }
 
 /* Frees node N. */
 void list_free_node(struct node* n) {
+
     free(n);
 }
 
 /* Cleans up entire list L data structure.
  * Returns 0 if succesful, 1 otherwise. */
 int list_cleanup(struct list* l) {
+
     free(l);
+    if (!l) {
+    	return 0;
+    }
+    return 0;
 }
 
+/* Returns 1 if node N is present in list L, 0 otherwise. */
 int list_node_present(struct list* l, struct node* n) {
-    ;
+
+    struct node *last = l->head; 
+    while (last != n) { 
+        last = last->next;
+        if (last == n) {
+        	return 1;
+        } 
+    }
+    return 0;
 }
 
+/* Inserts node N after node M in list L.
+ * Fails if node M is not in the list L or if node N is already in list L.
+ * Returns 0 if N was succesfully inserted, or 1 otherwise. */
 int list_insert_after(struct list* l, struct node* n, struct node* m) {
-    ;
+
+    struct node *last = l->head; 
+    while (last != n) { 
+        last = last->next;
+        if (last == m) {
+        	last->next = n;
+        	return 0;
+        } 
+    }
+    return 1;
 }
 
+/* Inserts node N before node M in list L.
+ * Fails if node M is not in the list L or if node N is already in list L.
+ * Returns 0 if N was succesfully inserted, or 1 otherwise. */
 int list_insert_before(struct list* l, struct node* n, struct node* m) {
-    ;
+
+    struct node *last = l->head; 
+    struct node *prev;
+    while (last != m) { 
+    	prev = last;
+        last = last->next; 
+        // node N is already in list
+        if (last == n) {
+        	return 1;
+        }
+    } 
+    // if M is not in list 
+    if (!last) {
+    	return 1;
+    }
+    prev->next = n;
+    n->next = m;
+
+    return 0;  
 }
 
+/* Returns the length of list L, or 0 if L is the NULL pointer */
 int list_length(struct list* l) {
-    ;
+
+    // check if L is the NULL pointer
+    if (!l) {
+    	return 0;
+    }
+    struct node *last = l->head; 
+    int count = 0;
+    while (last != NULL) 
+    { 
+        last = last->next; 
+        count++;
+    }
+    return count;
 }
 
+/* Returns a pointer to the i^th node of list L or NULL if there is no i^th
+ * element in list L. */
 struct node* list_get_ith(struct list* l, int i) {
-    ;
+
+    struct node *last = l->head; 
+    int count = 1;
+    while (count != i) 
+    { 
+        last = last->next; 
+        count++;
+        if (!last) {
+        	return NULL;
+        }
+    }
+    return last;
 }
 
+/* Cuts list L into 2 lists, with node N being the last node in the first half
+ * and all nodes after nodes N are added to the second half, preserving the
+ * same order they were in in the original list.
+ * Modifies list L to only contain the first half and creates a new list for
+ * the second half. Returns a pointer to the second half if succesfully cut
+ * and NULL otherwise. */
 struct list* list_cut_after(struct list* l, struct node* n) {
-    ;
+
+	if (!list_node_present(l, n)) {
+		return NULL;
+	}
+    struct node *last = l->head; 
+    struct node *prev;
+    while (last != n) { 
+    	prev = last;
+        last = last->next; 
+    } 
+    prev->next = n;
+    return 0;      
 }

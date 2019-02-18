@@ -126,12 +126,12 @@ int list_add_back(struct list* l, struct node* n) {
 		return 1;
 	}
 	if (!list_head(l)) {
-        // make if the head and tail if list has no elements
+        // if the list has no elements
         l->head = n;
     }
     struct node *last = list_tail(l); 
     last->next = n;
-    return 0;    
+    return 0;
 }
 
 

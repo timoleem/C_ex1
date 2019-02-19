@@ -18,6 +18,8 @@
  * Also, do not forget to add any required includes at the top of your file.
  */
 
+#include "list.h"
+
 struct list {
 
     struct node* head;
@@ -150,7 +152,7 @@ int list_node_value(struct node* n) {
  * Returns 0 if N was succesfully unlinked from list L, or 1 otherwise */
 int list_unlink_node(struct list* l, struct node* n) {
 
-    if (!l || !n || list_node_present(l, n)) {
+    if (!l || !n) {
         return 1;
     }
     if (n == list_head(l)) {
@@ -183,7 +185,6 @@ int list_cleanup(struct list* l) {
     }
     struct node *last = list_head(l); 
     while (last != NULL) { 
-
         struct node *temp = last;
         last = list_next(last);
         list_unlink_node(l, temp);        
@@ -196,16 +197,13 @@ int list_cleanup(struct list* l) {
 /* Returns 1 if node N is present in list L, 0 otherwise. */
 int list_node_present(struct list* l, struct node* n) {
 
-    if (!l || !n) {
-        return 0;
+    struct node *last = list_head(l); 
+    while (last != NULL) { 
+        if (last == n) {
+            return 1;
+        } 
+        last = list_next(n);
     }
-    // struct node *last = list_head(l); 
-    // while (last != NULL) { 
-    //     if (last == n) {
-    //         return 1;
-    //     } 
-    //     last = last->next;
-    // }
     return 0;
 }
 
@@ -214,15 +212,16 @@ int list_node_present(struct list* l, struct node* n) {
  * Returns 0 if N was succesfully inserted, or 1 otherwise. */
 int list_insert_after(struct list* l, struct node* n, struct node* m) {
 
-    struct node *last = list_head(l); 
-    while (last != n) { 
-        last = list_next(last);
-        if (last == m) {
-            last->next = n;
-            return 0;
-        } 
+    if (!l || !n || !m) {
+        return 1;
     }
-    return 1;    
+    else if (list_node_present(l, n) == 1 || list_node_present(l, m) == 0) {
+        return 1;
+    }
+    struct node *next_m = list_next(m);
+    n->next = next_m;
+    m->next = n;
+    return 0;
 }
 
 /* Inserts node N before node M in list L.
@@ -230,24 +229,16 @@ int list_insert_after(struct list* l, struct node* n, struct node* m) {
  * Returns 0 if N was succesfully inserted, or 1 otherwise. */
 int list_insert_before(struct list* l, struct node* n, struct node* m) {
 
-    struct node *last = list_head(l); 
-    struct node *prev;
-    while (last != m) { 
-        prev = last;
-        last = list_next(l); 
-        // node N is already in list
-        if (last == n) {
-            return 1;
-        }
-    } 
-    // if M is not in list 
-    if (!last) {
+    if (!l || !n || !m) {
         return 1;
     }
-    prev->next = n;
+    else if (list_node_present(l, n) == 1 || list_node_present(l, m) == 0) {
+        return 1;
+    }
+    struct node *prev_m = list_prev(l, m);
+    prev_m->next = n;
     n->next = m;
-
-    return 0;    
+    return 0;
 }
 
 /* Returns the length of list L, or 0 if L is the NULL pointer */

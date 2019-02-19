@@ -4,6 +4,9 @@
 #include <getopt.h>
 #include <math.h>
 
+// #include <stdbool.h>
+#include <ctype.h>
+
 #include "list.h"
 #define BUF_SIZE 1024
 
@@ -43,28 +46,82 @@ int parse_options(struct config *cfg, int argc, char *argv[]) {
     return 0;
 }
 
+void display_list(struct list* l) {
+    struct node* last = list_head(l);
+    while (last) {
+        int num = list_node_value(last);
+        printf("%d \n", num);
+        last = list_next(last); 
+    }
+}
+
+// struct list *sort_list(struct list* l) {
+//     if (list_head(l) == NULL) {
+//         return l;
+//     } 
+// }
+
 int main(int argc, char *argv[]) {
     struct config cfg;
     if (parse_options(&cfg, argc, argv) != 0) {
         return 1;
     }
 
-    // SOME CODE MISSING HERE
+    struct list* l = list_init();
+    struct list* sl = list_init();
+
+    struct node* n; 
+    int num;
     
-    char *input = argv[1];
-
-    // struct node* n = list_new_node(*input);
-
-    printf("%s", input);
-    // printf("%d", argv);
-
     while (fgets(buf, BUF_SIZE, stdin)) {
-    
-        // SOME CODE MISSING HERE
-    
+           
+        for (char *p = strtok(buf, " \n"); p; p = strtok(NULL, " \n")) {
+            
+            if (isdigit(*p)) {
+                num = atoi(p);
+                n = list_new_node(num);
+                list_add_back(l, n);            
+            }
+        }
     }
 
-    // SOME CODE MISSING HERE
+    if (list_head(l) == NULL || list_next(list_head(l)) == NULL) {
+        display_list(l);
+        list_cleanup(l);
+    } 
+
+    struct node *last = list_head(l);
+    while(last != NULL) {
+        if (list_head(sl) == NULL) {
+            struct node *new = list_new_node(list_node_value(last));
+            list_add_front(sl, new);
+        }
+        else if (list_node_value(last) < list_node_value(list_head(sl))) {
+            struct node *new = list_new_node(list_node_value(last));
+            list_add_front(sl, new);
+        }
+        else {
+            struct node *c = list_head(sl);
+            while (c != NULL) {
+                if (list_next(c) == NULL) {
+                    struct node *new = list_new_node(list_node_value(last));
+                    list_add_front(sl, new);
+                    break;
+                }
+                else if (list_node_value(last) < list_node_value(c)) {
+                    struct node *new = list_new_node(list_node_value(last));
+                    list_add_front(sl, new);
+                    break;
+                }
+                c = list_next(c);   
+            }
+        }
+        last = list_next(last);
+    }
+
+    display_list(sl);
+    list_cleanup(l);
+    list_cleanup(sl);
     
     return 0;
 }

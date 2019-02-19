@@ -46,6 +46,7 @@ int parse_options(struct config *cfg, int argc, char *argv[]) {
     return 0;
 }
 
+// Display the entire list, node for node
 void display_list(struct list* l) {
     struct node* last = list_head(l);
     while (last) {
@@ -55,11 +56,10 @@ void display_list(struct list* l) {
     }
 }
 
+// Check if char is numeric. This will fail if 
 char is_numeric(char p[]) {
-    // if (isdigit(p)) {
-    //     return 1;
-    // }
-    if (p[0] == '-' || isdigit(p[0])) {
+
+    if ((p[0] == '-' && isdigit(p[1])) || isdigit(p[0])) {
         return 1;
     }
     return 0;

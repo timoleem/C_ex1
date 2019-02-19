@@ -61,18 +61,9 @@ void display_list(struct list* l) {
     }
 }
 
-char is_digit(char p[]) {
-
-    for (int i = 0; i < (signed) strlen(p); i++) {
-        if (p[i] != '-' || !isdigit(p[i])) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-// Check if char is numeric. This will only succeed if the first item is a 
-// digit or if the first is a minus and the second a digit. 
+// Check if char is numeric. This will not succeed if you have for 
+// example -4- because there is no problem that there are multiple 
+// negatives. 
 char is_numeric(char p[]) {
 
     for (int i = 0; i < (signed) strlen(p); i++) {
@@ -80,9 +71,6 @@ char is_numeric(char p[]) {
             return 0;
         }
     }
-    // if ((p[0] == '-' && is_digit(p)) || is_digit(p)) {
-    //     return 1;
-    // }
     return 1;
 }
 

@@ -1,31 +1,24 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-/* 
- * TODO: A lot of code missing here. You will need to add implementations for
- * all the functions described in list.h here.
- * 
- * Start by adding the definitions for the list and node structs. You may
- * implement any of the Linked List versions discussed in the lecture, which
- * have some different trade-offs for the functions you will need to write. 
- * 
- * Note: The function prototypes in list.h assume the most basic Singly Linked
- * List. If you build some other version, you may not need all of the function
- * arguments for all of the described functions. This will produce a warning,
- * which you can suppress by adding a simple if-statement to check the value
- * of the unused parameter.
- *
- * Also, do not forget to add any required includes at the top of your file.
- */
+
+// Made by  
+// Timo Leemans
+// Student number : 10785612
+// 20 / 02 / 2019
+
+// Extra functions necessary for a solid working insertion sort
 
 #include "list.h"
 
+// Necessary structs and variables for list
 struct list {
 
     struct node* head;
     int count;
 };
 
+// Necessary structs and variables for node
 struct node {
 
     struct node* next;

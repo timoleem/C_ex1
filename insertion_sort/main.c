@@ -3,12 +3,16 @@
 #include <string.h>
 #include <getopt.h>
 #include <math.h>
-
-// #include <stdbool.h>
 #include <ctype.h>
 
 #include "list.h"
 #define BUF_SIZE 1024
+
+// Script for insertion sort 
+// Made by  
+// Timo Leemans
+// Student number : 10785612
+// 20 / 02 / 2019
 
 static char buf[BUF_SIZE];
 
@@ -48,6 +52,7 @@ int parse_options(struct config *cfg, int argc, char *argv[]) {
 
 // Display the entire list, node for node
 void display_list(struct list* l) {
+
     struct node* last = list_head(l);
     while (last) {
         int num = list_node_value(last);
@@ -56,31 +61,52 @@ void display_list(struct list* l) {
     }
 }
 
-// Check if char is numeric. This will fail if 
-char is_numeric(char p[]) {
+char is_digit(char p[]) {
 
-    if ((p[0] == '-' && isdigit(p[1])) || isdigit(p[0])) {
-        return 1;
+    for (int i = 0; i < (signed) strlen(p); i++) {
+        if (p[i] != '-' || !isdigit(p[i])) {
+            return 0;
+        }
     }
-    return 0;
+    return 1;
 }
 
+// Check if char is numeric. This will only succeed if the first item is a 
+// digit or if the first is a minus and the second a digit. 
+char is_numeric(char p[]) {
+
+    for (int i = 0; i < (signed) strlen(p); i++) {
+        if (p[i] != '-' && !isdigit(p[i])) {
+            return 0;
+        }
+    }
+    // if ((p[0] == '-' && is_digit(p)) || is_digit(p)) {
+    //     return 1;
+    // }
+    return 1;
+}
+
+// Main program. It takes arguments for the specific actions and the 
+// arg values for a list which it can convert according to a specific case
 int main(int argc, char *argv[]) {
     struct config cfg;
     if (parse_options(&cfg, argc, argv) != 0) {
         return 1;
     }
 
+    // initialize the list and the sorted list 
     struct list* l = list_init();
     struct list* sl = list_init();
 
+    // initialize a node necessary to update the list
     struct node* n; 
     int num;
     
+    // while the user provides input, add to the list if it is a digit
     while (fgets(buf, BUF_SIZE, stdin)) {
-           
+        // skips spaces and new lines to take all numerics
         for (char *p = strtok(buf, " \n"); p; p = strtok(NULL, " \n")) {
-            
+            //if it is a numeric, add it to the back of the list
             if (is_numeric(p)) {
                 num = atoi(p);
                 n = list_new_node(num);
@@ -88,22 +114,29 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-
+    // if there is no list or if there is only 1 item in the list then
+    // display it and return 0.  
     if (list_head(l) == NULL || list_next(list_head(l)) == NULL) {
         display_list(l);
         list_cleanup(l);
+        return 0;
     } 
 
+    // if not, then update the sorted list in the right order
     struct node *last = list_head(l);
     while(last != NULL) {
+        // if the sorted list is empty, add the last node of list to it
         if (list_head(sl) == NULL) {
             struct node *new = list_new_node(list_node_value(last));
             list_add_front(sl, new);
         }
+        // if the first node is bigger, add the node to the front
         else if (list_node_value(last) < list_node_value(list_head(sl))) {
             struct node *new = list_new_node(list_node_value(last));
             list_add_front(sl, new);
         }
+        // if the first node is smaller, go through the sorted list until it
+        // finds a number that is bigger. Then add it before the bigger num
         else {
             struct node *c = list_head(sl);
             while (c != NULL) {
@@ -128,6 +161,7 @@ int main(int argc, char *argv[]) {
         last = list_next(last);
     }
 
+    // Display the sorted list and free both the lists
     display_list(sl);
     list_cleanup(l);
     list_cleanup(sl);

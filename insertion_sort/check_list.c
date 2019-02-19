@@ -102,7 +102,6 @@ START_TEST (test_prev_multiple)
         n = list_prev(l, m);
         ck_assert_ptr_nonnull(n);
         ck_assert_ptr_ne(m, n); 
-        
         m = n;
     }
     

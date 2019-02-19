@@ -215,9 +215,6 @@ int list_insert_after(struct list* l, struct node* n, struct node* m) {
     if (!l || !n || !m) {
         return 1;
     }
-    else if (list_node_present(l, n) == 1 || list_node_present(l, m) == 0) {
-        return 1;
-    }
     struct node *next_m = list_next(m);
     n->next = next_m;
     m->next = n;
@@ -230,9 +227,6 @@ int list_insert_after(struct list* l, struct node* n, struct node* m) {
 int list_insert_before(struct list* l, struct node* n, struct node* m) {
 
     if (!l || !n || !m) {
-        return 1;
-    }
-    else if (list_node_present(l, n) == 1 || list_node_present(l, m) == 0) {
         return 1;
     }
     struct node *prev_m = list_prev(l, m);

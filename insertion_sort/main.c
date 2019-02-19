@@ -50,16 +50,20 @@ void display_list(struct list* l) {
     struct node* last = list_head(l);
     while (last) {
         int num = list_node_value(last);
-        printf("%d \n", num);
+        printf("%d\n", num);
         last = list_next(last); 
     }
 }
 
-// struct list *sort_list(struct list* l) {
-//     if (list_head(l) == NULL) {
-//         return l;
-//     } 
-// }
+char is_numeric(char p[]) {
+    // if (isdigit(p)) {
+    //     return 1;
+    // }
+    if (p[0] == '-' || isdigit(p[0])) {
+        return 1;
+    }
+    return 0;
+}
 
 int main(int argc, char *argv[]) {
     struct config cfg;
@@ -77,7 +81,7 @@ int main(int argc, char *argv[]) {
            
         for (char *p = strtok(buf, " \n"); p; p = strtok(NULL, " \n")) {
             
-            if (isdigit(*p)) {
+            if (is_numeric(p)) {
                 num = atoi(p);
                 n = list_new_node(num);
                 list_add_back(l, n);            
@@ -105,12 +109,17 @@ int main(int argc, char *argv[]) {
             while (c != NULL) {
                 if (list_next(c) == NULL) {
                     struct node *new = list_new_node(list_node_value(last));
-                    list_add_front(sl, new);
+                    if (list_node_value(last) < list_node_value(c)) {
+                        list_insert_before(sl, new, c);
+                    }
+                    else {
+                        list_insert_after(sl, new, c);                        
+                    }
                     break;
                 }
                 else if (list_node_value(last) < list_node_value(c)) {
                     struct node *new = list_new_node(list_node_value(last));
-                    list_add_front(sl, new);
+                    list_insert_before(sl, new, c);
                     break;
                 }
                 c = list_next(c);   

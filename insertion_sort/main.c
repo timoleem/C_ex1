@@ -185,17 +185,35 @@ struct list* intermediate_insert(struct list *l) {
     return l;
 }
 
+struct list* zip_lists(struct list *l, struct list *ll) {
+
+    int length = list_length(ll);
+    struct node *nn = list_head(ll);
+    struct node *n = list_head(l);
+
+    for (int i = 0; i < length; i++) {
+        list_insert_after(l, nn, n);
+        n = list_next(list_next(n));
+        nn = list_next(nn);
+    } 
+}
+
 // Alternate zip. Was not able to finish it but managed to implement the 
 // list get ith and list cut after. Really have 10 more minutes left so 
 // I have to leave it like this unfortunately... 
 struct list* alternate_zip(struct list *l) {
 
     struct list *ll = list_init();
+    struct list *zip = list_init();
+
     int length = list_length(l);
     struct node *nn = list_get_ith(l, length/2);
     ll = list_cut_after(l, nn);
+    zip = zip_lists(l, ll); 
     return ll;
 }
+
+
 
 // Main program. It takes arguments for the specific actions and the 
 // arg values for a list which it can convert according to a specific case

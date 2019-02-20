@@ -191,11 +191,11 @@ int list_cleanup(struct list* l) {
 int list_node_present(struct list* l, struct node* n) {
 
     struct node *last = list_head(l); 
-    while (last != NULL) { 
-        if (last == n) {
+    while (last != NULL) {
+        if (list_node_value(last) == list_node_value(n)) {
             return 1;
-        } 
-        last = list_next(n);
+        }
+        last = list_next(last);
     }
     return 0;
 }
@@ -249,15 +249,17 @@ int list_length(struct list* l) {
  * element in list L. */
 struct node* list_get_ith(struct list* l, int i) {
 
+    if (!l) {
+        return NULL;
+    }
     struct node *last = l->head; 
-    int count = 1;
-    while (count != i) 
-    { 
+    int count = 0;
+    while (count != i) { 
         last = last->next; 
-        count++;
         if (!last) {
             return NULL;
         }
+        count++;
     }
     return last;
 }
@@ -270,15 +272,15 @@ struct node* list_get_ith(struct list* l, int i) {
  * and NULL otherwise. */
 struct list* list_cut_after(struct list* l, struct node* n) {
 
-    if (!list_node_present(l, n)) {
+    if (!l || !n || !list_node_present(l, n)) {
         return NULL;
     }
-    struct node *last = l->head; 
-    struct node *prev;
-    while (last != n) { 
-        prev = last;
-        last = last->next; 
+    struct list *second = list_init();
+    while (n != NULL) { 
+        n = n->next;
+        struct node *new = list_new_node(list_node_value(n));
+        list_add_back(second, new);
+        list_unlink_node(l, n);
     } 
-    prev->next = n;
-    return 0; 
+    return second; 
 }

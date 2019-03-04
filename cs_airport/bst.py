@@ -4,7 +4,9 @@ class BST(object):
     def __init__(self, key_list=[]):
         """Create a new BST, set its attributes, and insert all the keys in
            the key_list into the BST."""
-        pass
+        self.bst = []
+        for key in key_list:
+          self.insert(key, key.value)
     
     def get_root(self):
         """Return the root of the BST."""
@@ -36,7 +38,8 @@ class BST(object):
            
            Return the new inserted node, or None if the key and value could not
            be inserted."""
-        pass
+        node = Node(key, value)
+        return node
     
     def delete(self, key):
         """Remove the Node object containing the key if the key exists in

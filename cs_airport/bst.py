@@ -4,30 +4,40 @@ class BST(object):
     def __init__(self, key_list=[]):
         """Create a new BST, set its attributes, and insert all the keys in
            the key_list into the BST."""
-        self.bst = []
+        self.root = None
+        self.size = 0
+        self.max = 0
+        self.min = 0
+
         for key in key_list:
-          self.insert(key, key.value)
+            self.insert(key)
     
     def get_root(self):
         """Return the root of the BST."""
-        pass
+        return self.root
     
     def is_empty(self):
         """Return True if the BST is empty."""
-        pass
+        if not self.root: 
+          return True
     
     def find_max(self):
         """Return the node with the maximum key in the BST."""
-        pass
+        return self.max
     
     def find_min(self):
         """Return the node with the minimum key in the BST."""
-        pass
+        return self.min
     
     def search(self, key):
         """Return the Node object containing the key if the key exists in
            the BST, else return None."""
-        pass
+        if self.root is None:
+            return None
+        elif self.root == key:
+            return self.root
+        elif key > self.root: 
+            return 
     
     def contains(self, key):
         """ Return True if the key exists in the BST, else return False."""
@@ -35,12 +45,32 @@ class BST(object):
     
     def insert(self, key, value=None):
         """Create a new node for this key and value, and insert it into the BST.
-           
            Return the new inserted node, or None if the key and value could not
            be inserted."""
-        node = Node(key, value)
-        return node
-    
+        if not self.root:
+            print('yes add root ', key)
+            self.root = Node(key, value)
+        else: 
+            if key > self.root and self.root.right is None: 
+                if self.root.right is None:
+                    self.root.right = Node(key, value)
+                    self.root.right.parent = self.root       
+                    print('yes right', self.root, self.root.right, self.root.right.parent)         
+                else: 
+                    self.root = self.root.right
+                    print('no right', self.root, self.root.right)
+                    self.insert(key)
+            else: 
+                if self.root.left is None:
+                    self.root.left = Node(key, value)
+                    self.root.left.parent = self.root 
+                    print('yes left', self.root, self.root.left, self.root.left.parent)                  
+                else: 
+                    self.root = self.root.left
+                    print('no left', self.root, self.root.left)
+                    self.insert(key)
+        self.size += 1
+
     def delete(self, key):
         """Remove the Node object containing the key if the key exists in
            the BST and return the removed node, else return None.
@@ -72,5 +102,9 @@ class BST(object):
            _ _ _ _
            3 5 8
            """
-        pass
+        pass 
 
+bst = BST([1,2,3,4,3,2,4])
+
+# print(bst.get_root())
+# print(BST([1, 2]).insert(4))

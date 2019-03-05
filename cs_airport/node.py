@@ -11,19 +11,19 @@ class Node(object):
     def get_key(self):
         """Return the key of this node."""
         return self.key
-    
+
     def get_value(self):
         """Return the value of this node."""
         return self.value
-    
+
     def get_parent(self):
         """Return the parent node of this node."""
         return self.parent 
-    
+
     def get_left_child(self):
         """Return the left child node of this node."""
         return self.left
-    
+
     def get_right_child(self):
         """Return the right child node of this node."""
         return self.right
@@ -31,10 +31,10 @@ class Node(object):
     def get_height(self):
         """Return the height of this node."""
         return self.height
-    
+
     def update_height(self):
         """Update the height based on the height of the left and right nodes."""
-        pass
+        self.height += 1
 
     def node_or_number(self, other):
         """Evaluate if other is a node or number and return number"""
@@ -42,16 +42,15 @@ class Node(object):
             return other
         else: 
             return other.key        
-    
+
     def __eq__(self, other):
         """Returns True if the node key is equal to other, which can be
            another node or a number."""
-        other_value = self.node_or_number(other)     
-        if self.key == other_value:
-            return True
-        else:
-            return False
-    
+        if self.key:
+            other_value = self.node_or_number(other)     
+            if self.key == other_value:
+                return True
+
     def __neq__(self, other):
         """Returns True if the node key is not equal to other, which can be
            another node or a number."""
@@ -104,17 +103,4 @@ class Node(object):
             return str(self.key)
         else:
             string = str(self.key) + '/' + str(self.value) 
-        return string
-        
-n = Node(3, 'three')
-n2 = Node(9, 'nine')
-n3 = Node(6, 'six')
-
-if n2 >= n3:
-    print('yes')
-
-print(n)
-print(n.get_key())
-print(n.get_value())
-print(n.get_left_child())
-
+            return string

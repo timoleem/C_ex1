@@ -35,6 +35,11 @@ class Node(object):
     def update_height(self):
         """Update the height based on the height of the left and right nodes."""
         self.height += 1
+        
+     #    if isempty(bst):
+	    #     return 0
+	    # else:
+	    #     return 1 + max(height(bst.left), height(bst.right))
 
     def node_or_number(self, other):
         """Evaluate if other is a node or number and return number"""

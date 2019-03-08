@@ -83,35 +83,58 @@ class BST(object):
         """Create a new node for this key and value, and insert it into the BST.
            Return the new inserted node, or None if the key and value could not
            be inserted."""
-        if not self.root:
+        if not self.root: 
             self.root = Node(key, value)
-        else: 
-            if key < self.root:
-                if self.root.left is None: 
-                    self.root.left = Node(key, value)
-                    self.root.left.parent = self.root
-                    # print('yes left', self.root, self.root.left, self.root.left.parent)                 
-                    self.min = key 
-                else: 
-                    self.root = self.root.left
-                    # print('no left', self.root, self.root.left)
-                    self.insert(key)
+            return self.root
+
+        new_node = Node(key, value)
+        current = self.root
+        parent_node = None
+ 
+        while current is not None:
+            parent_node = current
+            if new_node.key < current.key: 
+                current = current.left
             else: 
-                if self.root.right is None: 
-                    self.root.right = Node(key, value)
-                    self.root.right.parent = self.root
-                    # print('yes right', self.root, self.root.right, self.root.right.parent)
-                    self.max = key
-                else: 
-                    self.root = self.root.right
-                    # print('no right', self.root, self.root.right)
-                    self.insert(key)
+                current = current.right
+        new_node.parent = parent_node
+        if new_node.key < parent_node.key:
+            parent_node.left = new_node
+        elif new_node.key > parent_node.key: 
+            parent_node.right = new_node
+        else: 
+            return None        
+        return new_node
 
     def back_to_top(self): 
-        """Set the root back at the top of the tree such that the program can start over and
-           work itself down the branches again"""
+        """Set the root back at the top of the tree such that the program 
+           can start over and work itself down the branches again"""
         while self.root.parent is not None: 
             self.root = self.root.parent 
+
+    def min_rightside_tree(self, node):
+        '''Helper function for the delete, get the minimun node of the 
+           right side of the tree'''
+        if node.left is None: 
+            return node
+        else: 
+            while node.left is not None: 
+                node = node.left
+        return node    
+
+    def transplant(self, node, child):
+        '''Swap two nodes'''
+        print(node.key, child.key)
+        if node.parent is None: 
+            self.root = child
+        elif node is node.parent.left:
+            node.parent.left = child
+        else: 
+            node.parent.right = child
+        if child is not None: 
+            print('yes', child.key)
+            child.parent = node.parent
+
 
     def delete(self, key):
         """Remove the Node object containing the key if the key exists in
@@ -119,20 +142,29 @@ class BST(object):
            
            The returned node is the actual Node object that got removed
            from the BST, and so might be the successor of the removed key."""
-        if self.contains(key):
-            self.root = self.search(key)
-            self.root.left = None
-            self.root.right = None
-            deleted_node = self.root
-            if self.root is self.root.parent.right: 
-                self.root.parent.right = None
-            elif self.root is self.root.parent.left: 
-                self.root.parent.left = None
-            self.root.parent = None 
-            return deleted_node
+        if self.contains(key): 
+            node = self.search(key)
+            self.back_to_top()
         else: 
             return None
-        pass
+
+        if node.left is None: 
+            self.transplant(node, node.right)
+        elif node.right is None:
+            self.transplant(node, node.left)
+        else: 
+            minimum = self.min_rightside_tree(node.right)
+            if minimum.parent is not node: 
+                self.transplant(minimum, minimum.right)
+                minimum.right = node.right
+                minimum.right.parent = node 
+            self.transplant(node, minimum)
+            minimum.left = node.left
+            minimum.left.parent = minimum
+
+            # minimum.right = node.right
+            # minimum.right.parent = minimum 
+        return node
     
     def in_order_traversal(self):
         """Return a list of the Nodes in the tree in sorted order."""
@@ -150,12 +182,6 @@ class BST(object):
             self.in_order_recursion(root.right, ordered)
         return ordered
 
-    def validate_end_tree(self, tree_list):
-        for item in tree_list: 
-            if isinstance(item, int): 
-                return True
-        return False
-
     def breadth_first_traversal(self):
         """Return a list of lists, where each inner lists contains the elements
            of one layer in the tree. Layers are filled in breadth-first-order,
@@ -165,8 +191,8 @@ class BST(object):
            [[Node(5)], [None, Node(8)], [None, None]]"""
         bft_list = []
         temp_nodes = [self.root]
-        bft_list.append([self.root.key])
-        while self.validate_end_tree(bft_list[-1]):
+        bft_list.append([self.root])
+        while bft_list[-1]:
             temp_keys = []
             branch = []
             for node in temp_nodes:
@@ -175,16 +201,16 @@ class BST(object):
                     if node.left is None: 
                         temp_keys.append(None)
                     else: 
-                        temp_keys.append(node.left.key)
+                        temp_keys.append(node.left)
                     if node.right is None: 
                         temp_keys.append(None)
                     else: 
-                        temp_keys.append(node.right.key)
+                        temp_keys.append(node.right)
                     temp_nodes.extend((node.left, node.right))
                 branch.extend(temp_nodes)
             temp_nodes = branch    
             bft_list.append(temp_keys)
-        return bft_list
+        return bft_list[:-1]
         
     
     def __str__(self):
@@ -197,18 +223,31 @@ class BST(object):
            _ _ _ _
            3 5 8
            """
-           
+        if self.root is None: 
+            return 'None'
+        string = ''  
+        for branch in self.breadth_first_traversal():
+            for leaf in branch: 
+                if leaf is None: 
+                    string += str('_ ')
+                else: 
+                    string += str(leaf) + ' '
+            string += '\n'
+        for key in self.in_order_traversal(): 
+            string += str(key) + ' '
+        return string        
         
+h = BST([20, 10, 25, 5, 18, 13, 15, 14])
+print(h)
+h.delete(10)
+print('\n')
+print(h)
 
-bst = BST([3, 2, 4, 8, 3, 6, 0, 1, 3])
-# print(bst.search(4))
-# print(bst.contains(3))
-# print(bst.contains(6))
-# print(bst.find_min())
-# print(bst.find_max())
-# print('')
-# print(bst.in_order_traversal())
-# print(bst. breadth_first_traversal())
 
-# print(bst.get_root())
-# print(BST([1, 2]).insert(4))
+
+
+
+
+
+
+

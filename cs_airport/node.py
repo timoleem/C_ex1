@@ -1,3 +1,10 @@
+"""The Node class in which the nodes are initialised with its pointers.
+It workes as necessary. Also the formulas are defined here. 
+
+Timo Leemans
+10785612
+"""
+
 class Node(object):
     def __init__(self, key, value=None):
         """Store the key and value in the node and set the other attributes."""
@@ -30,16 +37,28 @@ class Node(object):
 
     def get_height(self):
         """Return the height of this node."""
-        return self.height
+        if self.key is None: 
+            return -1 
+        else: 
+            return self.height
 
     def update_height(self):
         """Update the height based on the height of the left and right nodes."""
-        self.height += 1
-        
-     #    if isempty(bst):
-	    #     return 0
-	    # else:
-	    #     return 1 + max(height(bst.left), height(bst.right))
+        temp_node = self
+        # Update the node height and its parent node heights based on their 
+        # children
+        while temp_node is not None: 
+            if temp_node.left is None and temp_node.right is None: 
+                temp_node.height = 0
+            elif temp_node.left is None or temp_node.right is None:
+                if temp_node.left is None: 
+                    temp_node.height = temp_node.right.height + 1
+                else: 
+                    temp_node.height = temp_node.left.height + 1
+            else: 
+                temp_node.height = max(temp_node.right.height, \
+                temp_node.left.height) + 1
+            temp_node = temp_node.parent
 
     def node_or_number(self, other):
         """Evaluate if other is a node or number and return number"""

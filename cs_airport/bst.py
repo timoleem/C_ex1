@@ -1,5 +1,13 @@
 from node import Node
 
+"""The BST class creates a tree and updates the height of the nodes. It is 
+all supposed to work in O(h). In the end it prints the inserted nodes as a 
+tree and in sorted order.
+
+Timo Leemans
+10785612
+"""
+
 class BST(object):
     def __init__(self, key_list=[]):
         """Create a new BST, set its attributes, and insert all the keys in
@@ -8,7 +16,6 @@ class BST(object):
         self.size = 0
         for key in key_list:
             self.insert(key)
-            self.back_to_top()
     
     def get_root(self):
         """Return the root of the BST."""
@@ -21,60 +28,64 @@ class BST(object):
     
     def find_max(self):
         """Return the node with the maximum key in the BST."""
-        self.back_to_top()
-        if self.root is None: 
+        root = self.root
+        # keep taking the right node till its right node is None
+        if root is None: 
             return None
-        elif self.root.right is None: 
-            return self.root
+        elif root.right is None: 
+            return root
         else: 
-            while self.root.right is not None: 
-                self.root = self.root.right
-        max_node = self.root
-        return max_node
+            while root.right is not None: 
+                root = root.right
+        max_node = root
+        return max_node.key
     
     def find_min(self):
         """Return the node with the minimum key in the BST."""
-        self.back_to_top()
-        if self.root is None: 
+        root = self.root 
+        # keep taking the left node till its left node is None
+        if root is None: 
             return None
-        elif self.root.left is None: 
-            return self.root
+        elif root.left is None: 
+            return root
         else: 
-            while self.root.left is not None: 
-                self.root = self.root.left
-        min_node = self.root
-        return min_node
+            while root.left is not None: 
+                root = root.left
+        min_node = root
+        return min_node.key
     
     def search(self, key):
         """Return the Node object containing the key if the key exists in
            the BST, else return None."""
-        self.back_to_top()
-        while self.root.key != key: 
-            if key > self.root: 
-                if self.root.right is not None: 
-                    self.root = self.root.right
+        root = self.root
+        # Take the left or right node according to its key-value untill 
+        # it finds the key
+        while root.key != key: 
+            if key > root: 
+                if root.right is not None: 
+                    root = root.right
                 else: 
                     return None
             else: 
-                if self.root.left is not None: 
-                    self.root = self.root.left 
+                if root.left is not None: 
+                    root = root.left 
                 else: 
                     return None
-        key_node = self.root 
+        key_node = root 
         return key_node
-    
+
     def contains(self, key):
         """ Return True if the key exists in the BST, else return False."""
-        self.back_to_top()
-        while self.root.key != key: 
-            if key > self.root: 
-                if self.root.right is not None: 
-                    self.root = self.root.right
+        root = self.root 
+        while root.key != key: 
+            if key > root: 
+                if root.right is not None: 
+                    root = root.right
                 else: 
                     return False
             else: 
-                if self.root.left is not None: 
-                    self.root = self.root.left 
+                if root.left is not None: 
+                    root = root.left 
                 else: 
                     return False
         return True
@@ -83,34 +94,37 @@ class BST(object):
         """Create a new node for this key and value, and insert it into the BST.
            Return the new inserted node, or None if the key and value could not
            be inserted."""
+
+        # If the tree is empty, add the node as root
         if not self.root: 
             self.root = Node(key, value)
+            # self.root.update_height()
+            self.root.height = 0
             return self.root
 
+        # Else create a node and get the current root node 
         new_node = Node(key, value)
         current = self.root
         parent_node = None
  
+        # move the node to the required spot according to its key-value
         while current is not None:
             parent_node = current
             if new_node.key < current.key: 
                 current = current.left
             else: 
                 current = current.right
+
+        # Assign pointers from node to parent and back, then update height
         new_node.parent = parent_node
         if new_node.key < parent_node.key:
             parent_node.left = new_node
         elif new_node.key > parent_node.key: 
             parent_node.right = new_node
         else: 
-            return None        
+            return None
+        new_node.update_height()
         return new_node
-
-    def back_to_top(self): 
-        """Set the root back at the top of the tree such that the program 
-           can start over and work itself down the branches again"""
-        while self.root.parent is not None: 
-            self.root = self.root.parent 
 
     def min_rightside_tree(self, node):
         '''Helper function for the delete, get the minimun node of the 
@@ -123,8 +137,9 @@ class BST(object):
         return node    
 
     def transplant(self, node, child):
-        '''Swap two nodes'''
-        print(node.key, child.key)
+        '''Swap two nodes and re-assign all the pointers between these two 
+           nodes. After that update the height from the point of the swapped
+           node.'''
         if node.parent is None: 
             self.root = child
         elif node is node.parent.left:
@@ -132,9 +147,8 @@ class BST(object):
         else: 
             node.parent.right = child
         if child is not None: 
-            print('yes', child.key)
             child.parent = node.parent
-
+        node.update_height()
 
     def delete(self, key):
         """Remove the Node object containing the key if the key exists in
@@ -142,18 +156,25 @@ class BST(object):
            
            The returned node is the actual Node object that got removed
            from the BST, and so might be the successor of the removed key."""
+        
+        # If the key is not present, return None, else get the key-node
         if self.contains(key): 
             node = self.search(key)
-            self.back_to_top()
         else: 
             return None
 
+        # Transplant the right or left node in this order if either is None
         if node.left is None: 
             self.transplant(node, node.right)
         elif node.right is None:
             self.transplant(node, node.left)
+
+        # Transplant the minimum value of the right child and swap this with 
+        # its right child if necessary, then swap it with the key-node.
         else: 
             minimum = self.min_rightside_tree(node.right)
+            # Remember the parent of the minimum
+            parent = minimum.parent
             if minimum.parent is not node: 
                 self.transplant(minimum, minimum.right)
                 minimum.right = node.right
@@ -161,23 +182,25 @@ class BST(object):
             self.transplant(node, minimum)
             minimum.left = node.left
             minimum.left.parent = minimum
-
-            # minimum.right = node.right
-            # minimum.right.parent = minimum 
+            if minimum.right is not None:
+                minimum.right.parent = minimum
+            # Update the height of the minimum.parent node and its parents
+            parent.update_height()
         return node
     
     def in_order_traversal(self):
         """Return a list of the Nodes in the tree in sorted order."""
-        self.back_to_top()
         order = []
-        sorted_order = self.in_order_recursion(self.root, order)
+        root = self.root
+        sorted_order = self.in_order_recursion(root, order)
         return sorted_order
 
     def in_order_recursion(self, root, ordered):
-        """"""
+        """Helper function to make the recursion happend. It always takes the 
+           most left key-value and then the right, untill it is in order"""
         if root.left is not None: 
             self.in_order_recursion(root.left, ordered)
-        ordered.append(root.key)
+        ordered.append(root)
         if root.right is not None:
             self.in_order_recursion(root.right, ordered)
         return ordered
@@ -189,29 +212,31 @@ class BST(object):
            None elements.
            >> BST([5, 8]).breadth_first_traversal()
            [[Node(5)], [None, Node(8)], [None, None]]"""
+
+        # Initiate the final bft list and temporary nodes list 
         bft_list = []
         temp_nodes = [self.root]
         bft_list.append([self.root])
+
+        # While there are items in the last list of the bft list
         while bft_list[-1]:
-            temp_keys = []
-            branch = []
-            for node in temp_nodes:
-                temp_nodes = []
+            temp_nodes = bft_list[-1]
+            # Keep track of the nodes in the current level of the tree
+            level = []
+            for node in temp_nodes: 
                 if node is not None: 
                     if node.left is None: 
-                        temp_keys.append(None)
+                        level.append(None)
                     else: 
-                        temp_keys.append(node.left)
-                    if node.right is None: 
-                        temp_keys.append(None)
+                        level.append(node.left)
+                    if node.right is None:
+                        level.append(None)
                     else: 
-                        temp_keys.append(node.right)
-                    temp_nodes.extend((node.left, node.right))
-                branch.extend(temp_nodes)
-            temp_nodes = branch    
-            bft_list.append(temp_keys)
+                        level.append(node.right)
+            # Add the tree level to the bft list 
+            bft_list.append(level)
+        # Return all but the last empty list
         return bft_list[:-1]
-        
     
     def __str__(self):
         """Return a string containing the elements of the tree in breadth-first
@@ -223,6 +248,9 @@ class BST(object):
            _ _ _ _
            3 5 8
            """
+
+        # Add all nodes to the string with new lines where necessary 
+        # (spreekt voor zichaelf toch?)
         if self.root is None: 
             return 'None'
         string = ''  
@@ -236,18 +264,3 @@ class BST(object):
         for key in self.in_order_traversal(): 
             string += str(key) + ' '
         return string        
-        
-h = BST([20, 10, 25, 5, 18, 13, 15, 14])
-print(h)
-h.delete(10)
-print('\n')
-print(h)
-
-
-
-
-
-
-
-
-

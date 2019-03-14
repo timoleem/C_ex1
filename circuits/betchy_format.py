@@ -5,7 +5,10 @@ import os
 for b in range(1, 3):
     for l in range(1, 4):
         name = 'board'+ str(b) +'_list'+ str(l) +'.txt'
+        
+        # Process all 6 files into this format: boardN_listM.txt
         print('\nTrying to process', name)
+
         if not os.path.exists(name):
             print("\t No solution file found")
         else:

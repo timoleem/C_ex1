@@ -10,6 +10,7 @@ Timo Leemans
 """
 
 from bst import BST
+
 class Airport(BST):
     def __init__(self, wait_time=300000, simple=False):
         BST.__init__(self)

@@ -13,6 +13,7 @@ class Matrix(object):
         self.ybound = y
         self.neighbours = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.path = 0.01
+        self.cost = 0
 
         for pp, xx, yy in p: 
             self.insert(pp, xx, yy)
@@ -32,24 +33,27 @@ class Matrix(object):
             return (x[0], y[0])
         return ()
 
-    def cost(self, start, goal):
+    def get_cost(self, start, goal):
+
+        s = np.array([start[0], start[1]])
+        g = np.array([goal[0], goal[1]])
+            
+        dist = np.linalg.norm(s-g)
 
         (x1, y1) = start
         (x2, y2) = goal
-        cost = abs(x1 - x2) + abs(y1 - y2)
+        cost = abs(x1 - x2) + abs(y1 - y2) + dist
         return cost
 
-    def conflict(self, key):
-        print(key)
+    def conflict(self, key, prev_path):
         conflict = False
         x, y = key
 
-        try:
-            self.matrix[x, y]
-        except IndexError:
-            conflict = True
-
-        if self.matrix[x, y] != 0:
+        if (x >= self.xbound) or \
+           (y >= self.ybound) or \
+           (self.matrix[x, y] != 0) or \
+           key in prev_path:
+            # print('yes conflict')
             conflict = True
 
         return conflict
@@ -58,31 +62,38 @@ class Matrix(object):
 
         start = self.get_key_cor(key1)
         end = self.get_key_cor(key2)
-
+        # print(start, end, key1, key2)
         if start and end: 
-            path_cost = 0
             current = start
+            # print(current)
+            # print('\n')
             path = []
             while current != end:
-                cost = {}
+                cost_list = {}
                 for n in self.neighbours:
                     cur_neighbour = (current[0] + n[0], current[1] + n[1]) 
-                    if sorted(cur_neighbour) == sorted(end): 
+                    # print(cur_neighbour)
+                    if cur_neighbour == end: 
                         return path
-                    if self.conflict(cur_neighbour) is False:
-                        cur_cost = self.cost(cur_neighbour, end)
+                    if self.conflict(cur_neighbour, path) is False:
+                        cur_cost = self.get_cost(cur_neighbour, end)
                         if cur_cost > 0: 
-                            cost[cur_neighbour] = cur_cost
-                current = min(cost, key=cost.get)
-                path.append(current)
+                            cost_list[cur_neighbour] = cur_cost
+                # print('\n')
+                if cost_list:
+                    current = min(cost_list, key=cost_list.get)
+                    path.append(current)
+                    print(path)
+                # print('\n')
         return []
 
     def set_path(self, key1, key2):
-
-        for step in self.a_star(key1, key2):
-            x, y = step
-            self.insert(self.path, x, y)
-        self.path += 0.01
+        circuit = self.a_star(key1, key2)
+        if circuit:
+            for step in circuit:
+                x, y = step
+                self.insert(self.path, x, y)
+            self.path += 0.01
 
     def __str__(self):
 
@@ -100,7 +111,10 @@ class Matrix(object):
                         s += str(int(ga)) + " "
                     # s += str(int(ga))
                 else: 
-                    s += "0" + str(int(ga*100)) + " "              
+                    if ga >= 0.10:
+                        s += str(int(ga*100)) + " "
+                    else: 
+                        s += "0" + str(int(ga*100)) + " "              
             s += "\n"
 
         return s

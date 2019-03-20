@@ -1,122 +1,68 @@
-import numpy as np
-from scipy.spatial.distance import cdist
+from process_files import import_circuit 
 
-from node import Node
-from process_files import import_circuit
+import numpy as np
 
 class Matrix(object):
 
-    def __init__(self, x, y, p):
+    def __init__(self, x, y, z, p):
 
-        self.matrix = np.zeros((x, y))
+        self.matrix = np.zeros((z, y, x))
         self.xbound = x
         self.ybound = y
-        self.neighbours = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-        self.path = 0.01
-        self.cost = 0
 
         for pp, xx, yy in p: 
-            self.insert(pp, xx, yy)
+            self.insert(pp, xx, yy, 0)
 
-    def insert(self, p_ga, x_ga, y_ga):
+    def insert(self, point, x, y, z):
 
-        if x_ga <= self.xbound and y_ga <= self.ybound and \
-           x_ga >= 0 and y_ga >= 0: 
-
-            node = Node(p_ga, 0)
-            self.matrix[x_ga, y_ga] = node.key
+        if x <= self.xbound and y <= self.ybound and \
+           x >= 0 and y >= 0 and z >= 0 and z <= 7: 
+            self.matrix[z, y, x] = point
 
     def get_key_cor(self, key):
 
-        x, y = np.where(self.matrix==key)
-        if x: 
-            return (x[0], y[0])
-        return ()
+        x, y, z = np.where(self.matrix==key)
+        if len(x) == 0:
+            return ()
+        return (x[0], y[0], z[0])
 
-    def get_cost(self, start, goal):
+    def get_point(self, x, y, z):
 
-        s = np.array([start[0], start[1]])
-        g = np.array([goal[0], goal[1]])
-            
-        dist = np.linalg.norm(s-g)
+        return self.matrix[z, y, x]
 
-        (x1, y1) = start
-        (x2, y2) = goal
-        cost = abs(x1 - x2) + abs(y1 - y2) + dist
-        return cost
+    def remove_zero_layer(self):
 
-    def conflict(self, key, prev_path):
-        conflict = False
-        x, y = key
+        m = self.matrix
 
-        if (x >= self.xbound) or \
-           (y >= self.ybound) or \
-           (self.matrix[x, y] != 0) or \
-           key in prev_path:
-            # print('yes conflict')
-            conflict = True
-
-        return conflict
-
-    def a_star(self, key1, key2):
-
-        start = self.get_key_cor(key1)
-        end = self.get_key_cor(key2)
-        # print(start, end, key1, key2)
-        if start and end: 
-            current = start
-            # print(current)
-            # print('\n')
-            path = []
-            while current != end:
-                cost_list = {}
-                for n in self.neighbours:
-                    cur_neighbour = (current[0] + n[0], current[1] + n[1]) 
-                    # print(cur_neighbour)
-                    if cur_neighbour == end: 
-                        return path
-                    if self.conflict(cur_neighbour, path) is False:
-                        cur_cost = self.get_cost(cur_neighbour, end)
-                        if cur_cost > 0: 
-                            cost_list[cur_neighbour] = cur_cost
-                # print('\n')
-                if cost_list:
-                    current = min(cost_list, key=cost_list.get)
-                    path.append(current)
-                    print(path)
-                # print('\n')
-        return []
-
-    def set_path(self, key1, key2):
-        circuit = self.a_star(key1, key2)
-        if circuit:
-            for step in circuit:
-                x, y = step
-                self.insert(self.path, x, y)
-            self.path += 0.01
+        for layer in range(len(m)):
+            if np.count_nonzero(m[layer]) == 0:
+                for delete in range(len(m)-layer):
+                    m = np.delete(m, 6 - delete, axis=0)
+                return m
 
     def __str__(self):
 
-        s = ""
-        for row in self.matrix: 
-            for ga in row: 
-                # print(ga)
-                if ga == 0: 
-                    s += "__ "
-                elif ga >= 1:                    
-                    # s += "GA "
-                    if ga < 10:
-                        s += str(int(ga)) + "  "
-                    else: 
-                        s += str(int(ga)) + " "
-                    # s += str(int(ga))
-                else: 
-                    if ga >= 0.10:
-                        s += str(int(ga*100)) + " "
-                    else: 
-                        s += "0" + str(int(ga*100)) + " "              
-            s += "\n"
+        print_matrix = self.remove_zero_layer()
 
+        s = ""
+        for layer in print_matrix:
+            for row in layer: 
+                for point in row: 
+                    if point == 0:
+                        s += "__ "
+                    elif point < 100:
+                        # s += "GA "
+                        if point < 10:
+                            s += str(int(point)) + "  "
+                        else: 
+                            s += str(int(point)) + " "
+                    else: 
+                        if point > 109:
+                            s += str(int(point-100)) + " "
+                        else: 
+                            s += "0" + str(int(point-100)) + " "
+                s += "\n"
+            s += "\n"
         return s
 
 

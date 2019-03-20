@@ -1,97 +1,86 @@
-"""The Node class in which the nodes are initialised with its pointers.
-It workes as necessary. Also the formulas are defined here. 
+from matrix import Matrix
 
-Timo Leemans
-10785612
-"""
+import numpy as np
 
-class Node(object):
-    def __init__(self, key, value=None):
-        """Store the key and value in the node and set the other attributes."""
-        self.value = value
-        self.key = key
-    
-    def get_key(self):
-        """Return the key number of this node."""
-        return self.key
+class Circuit(object):
 
-    def get_value(self):
-        """Return the coordinates of this node."""
-        return self.value
+    def __init__(self, x, y, p):
 
-    def get_parent(self):
-        """Return the parent node of this node."""
-        return self.parent
+        self.matrix = Matrix(x, y, 7, p)
+        self.path = 0.01
+        self.neighbours = [(1, 0), (0, 1), (-1, 0), (0, -1), (-1), (1)]
+        self.xbound = x
+        self.ybound = y
 
-    def get_child(self):
-        """Return the left child node of this node."""
-        return self.child
+    def get_cost(self, start, goal):
 
-    def node_or_number(self, other):
-        """Evaluate if other is a node or number and return number"""
-        if isinstance(other, int):
-            return other
-        else: 
-            return other.key        
+        s = np.array([start[0], start[1]])
+        g = np.array([goal[0], goal[1]])
+            
+        dist = np.linalg.norm(s-g)
 
-    def __eq__(self, other):
-        """Returns True if the node key is equal to other, which can be
-           another node or a number."""
-        if self.key:
-            other_value = self.node_or_number(other)     
-            if self.key == other_value:
-                return True
+        (x1, y1) = start
+        (x2, y2) = goal
+        cost = abs(x1 - x2) + abs(y1 - y2) + dist
+        return cost
 
-    def __neq__(self, other):
-        """Returns True if the node key is not equal to other, which can be
-           another node or a number."""
-        other_value = self.node_or_number(other) 
-        if self.key != other_value:
-            return True
-        else:
-            return False
-    
-    def __lt__(self, other):
-        """Returns True if the node key is less than other, which can be
-           another node or a number."""
-        other_value = self.node_or_number(other) 
-        if self.key < other_value:
-            return True
-        else: 
-            return False
-    
-    def __le__(self, other):
-        """Returns True if the node key is less than or equal to other, which
-           can be another node or a number."""
-        other_value = self.node_or_number(other) 
-        if self.key <= other_value:
-            return True
-        else: 
-            return False
-    
-    def __gt__(self, other):
-        """Returns True if the node key is greater than other, which can be
-           another node or a number."""
-        other_value = self.node_or_number(other) 
-        if self.key > other_value: 
-            return True 
-        else: 
-            return False
-    
-    def __ge__(self, other):
-        """Returns True if the node key is greater than or equal to other,
-           which can be another node or a number."""
-        other_value = self.node_or_number(other) 
-        if self.key >= other_value:
-            return True
-        else:
-            return False
-    
+    def conflict(self, key, prev_path):
+
+        conflict = False
+        x, y = key
+
+        if (x >= self.xbound) or \
+           (y >= self.ybound) or \
+           (self.matrix.get_point(x, y) != 0) or \
+           (key in prev_path):
+            conflict = True
+
+        return conflict
+
+    def a_star(self, key1, key2):
+
+        start = self.matrix.get_key_cor(key1)
+        end = self.matrix.get_key_cor(key2)
+        if start and end: 
+            current = start
+
+            path = []
+            while current != end:
+                cost_list = {}
+                for n in self.neighbours:
+                    cur_neighbour = (current[0] + n[0], current[1] + n[1]) 
+
+                    if cur_neighbour == end: 
+                        return path
+                    if self.conflict(cur_neighbour, path) is False:
+                        cur_cost = self.get_cost(cur_neighbour, end)
+                        if cur_cost > 0: 
+                            cost_list[cur_neighbour] = cur_cost
+                if cost_list:
+                    current = min(cost_list, key=cost_list.get)
+                    path.append(current)
+        return []
+
+    def set_path(self, key1, key2):
+        circuit = self.a_star(key1, key2)
+        if circuit:
+            for step in circuit:
+                x, y = step
+                self.insert(self.path, x, y)
+            self.path += 0.01
+
+    def set_path(self, start, goal):
+
+        circuit = self.a_star(start, goal)
+        if circuit:
+            for step in circuit:
+                x, y = step
+                self.matrix.insert(self.path, x, y)
+            self.path += 0.01
+
     def __str__(self):
-        """Returns the string representation of the node in format: 'key/value'.
-           If no value is stored, the representation is just: 'key'."""
-        if self.value == None: 
-            return str(self.key)
-        else:
-            string = str(self.key) + '/' + str(self.value) 
-            return string
+
+        return str(self.matrix)
+
+
+

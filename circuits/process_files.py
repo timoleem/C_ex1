@@ -29,10 +29,12 @@ def import_circuit(file):
 		df = pd.read_excel(file, sheet_name='Sheet1')
 		gate = {}
 
-		# dimension = 
-		# print(df['Circuit Board'] == 'Dimensions')
-		dimension = df[df["Circuit Board"] == "Dimensions"]["X42 – 1"].item()
-		x, y = dimension.split(" x ")
+		if file == 'circuit_board_1.xlsx':
+			dimension = df[df["Circuit Board"] == "Dimensions"]['X42 – 1']
+		else: 
+			dimension = df[df["Circuit Board"] == "Dimensions"]['X42 – 2']
+		
+		x, y = dimension.item().split(" x ")
 
 		coordinates = process_coordinates(df)
 

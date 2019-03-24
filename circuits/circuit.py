@@ -23,7 +23,9 @@ class Circuit(object):
 
         (z1, y1, x1) = start
         (z2, y2, x2) = goal
-        cost = abs(x1 - x2) + abs(y1 - y2) + abs(z1 - z2)*1.5 + dist
+
+        cost = abs(x1 - x2) + abs(y1 - y2) + \
+               abs(z1 - z2)*1.5 + dist + abs(self.matrix.get_point(x1, y1, z1))
         return cost
 
     def conflict(self, point, prev_path):
@@ -33,7 +35,7 @@ class Circuit(object):
 
         if (x >= self.xbound) or \
            (y >= self.ybound) or \
-           (self.matrix.get_point(x, y, z) != 0) or \
+           (self.matrix.get_point(x, y, z) > 0) or \
            (point in prev_path):
             conflict = True
 
@@ -43,14 +45,9 @@ class Circuit(object):
 
         start = self.matrix.get_key_cor(key1)
         end = self.matrix.get_key_cor(key2)
-
         if start and end: 
             current = start
-
             path = []
-
-            paths = {}
-
             while current != end:
                 cost_list = {}
                 for n in self.neighbours_xyz:
@@ -58,17 +55,39 @@ class Circuit(object):
                     cy = current[1] + n[1]
                     cx = current[2] + n[2]
                     cur_neighbour = (cz, cy, cx)
+                    if cz >= 0:
+                        if cur_neighbour == end: 
+                            return path
+                        if self.conflict(cur_neighbour, path) is False:
+                            cur_cost = self.get_cost(cur_neighbour, end)
+                            if cur_cost > 0: 
+                                cost_list[cur_neighbour] = cur_cost
+                if cost_list:
+                    current = min(cost_list, key=cost_list.get)
+                    path.append(current)
+        return []
 
+    def a_star2(self, key1, key2):
+
+        start = self.matrix.get_key_cor(key1)
+        end = self.matrix.get_key_cor(key2)
+        if start and end: 
+            current = start
+            path = []
+            paths = {}
+            while current != end:
+                cost_list = {}
+                for n in self.neighbours_xyz:
+                    cz = current[0] + n[0]
+                    cy = current[1] + n[1]
+                    cx = current[2] + n[2]
+                    cur_neighbour = (cz, cy, cx)
                     if cur_neighbour == end: 
                         return path
                     if self.conflict(cur_neighbour, path) is False:
                         cur_cost = self.get_cost(cur_neighbour, end)
-                        if cur_cost > 0: 
-                            cost_list[cur_neighbour] = cur_cost
+                        cost_list[cur_neighbour] = cur_cost
                 if cost_list:
-                    # print(cost_list)
-                    # paths[]
-
                     current = min(cost_list, key=cost_list.get)
                     path.append(current)
         return []
@@ -76,13 +95,12 @@ class Circuit(object):
     def set_path(self, start, goal):
 
         circuit = self.a_star(start, goal)
-        # print(circuit)
         if circuit:
             for step in circuit:
                 z, y, x = step
                 self.matrix.insert(self.path, x, y, z)
                 self.total_cost += 1
-            self.path += 1
+        self.path += 1
 
     def get_total_cost(self):
 

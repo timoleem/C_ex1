@@ -9,9 +9,20 @@ class Matrix(object):
         self.matrix = np.zeros((z, y, x))
         self.xbound = x
         self.ybound = y
+        self.neighbours_xyz = [(0, 0, 1), (0, 1, 0), (0, 0, -1), \
+                               (0, -1, 0), (1, 0, 0), (-1, 0, 0)]
 
         for pp, xx, yy in p: 
             self.insert(pp, xx, yy, 0)
+            for n in self.neighbours_xyz:
+                cz = 0 + n[0]
+                cy = yy + n[1]
+                cx = xx + n[2]
+                if self.matrix[cz, cy, cx] <= 0:
+                    if cz == 0:
+                        self.matrix[cz, cy, cx] -= 1
+                    else: 
+                        self.matrix[cz, cy, cx] -= 2
 
     def insert(self, point, x, y, z):
 

@@ -1,4 +1,6 @@
+from __future__ import division
 import pandas as pd
+from heapq import heappush, heappop, heapify
 import os
 
 def process_coordinates(df):
@@ -60,3 +62,76 @@ def import_circuit(file):
 		netlist3.columns = ['first', 'second']
 
 	return int(x), int(y), coordinates, netlist1, netlist2, netlist3
+
+def distance_priority(links, coordinates):
+
+	cor = {}
+	for c in coordinates:
+		cor[c[0]] = (c[1], c[2])
+
+	priority = []
+	for index, row in links.iterrows():
+		c1 = cor[row[0]]
+		c2 = cor[row[1]]
+		distance = abs(c1[0] - c2[0]) + abs(c1[1] - c2[1])
+		heappush(priority, (distance, (row[0], row[1])))
+
+	links = []
+	while priority:
+		links.append(heappop(priority)[1])
+
+	return links
+
+def distance(links, coordinates):
+
+	cor = {}
+	dist = {}
+	for c in coordinates:
+		cor[c[0]] = (c[1], c[2])
+
+	for index, row in links.iterrows():
+		c1 = cor[row[0]]
+		c2 = cor[row[1]]
+		distance = abs(c1[0] - c2[0]) + abs(c1[1] - c2[1])
+		dist[(row[0], row[1])] = distance
+
+	return dist
+
+def circuits_priority(links, coordinates):
+
+	priority = []
+	occurence = {}
+	distance_dict = distance(links, coordinates)
+
+	for index, row in links.iterrows():
+		for point in row:
+			if point in occurence:
+				occurence[point] -= 1
+			else: 
+				occurence[point] = 4
+
+	for index, row in links.iterrows():
+		minimum = min([occurence[row[0]], occurence[row[1]]])
+		dist_weight = distance_dict[(row[0], row[1])]/100
+		heappush(priority, (minimum + dist_weight, (row[0], row[1])))
+
+	links = []
+	while priority:
+		links.append(heappop(priority)[1])
+
+	return links
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

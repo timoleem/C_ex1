@@ -1,4 +1,3 @@
-from process_files import import_circuit 
 
 import numpy as np
 
@@ -6,6 +5,7 @@ class Matrix(object):
 
     def __init__(self, x, y, z, p):
 
+        self.links = p
         self.matrix = np.zeros((z, y, x))
         self.xbound = x
         self.ybound = y
@@ -14,15 +14,6 @@ class Matrix(object):
 
         for pp, xx, yy in p: 
             self.insert(pp, xx, yy, 0)
-            for n in self.neighbours_xyz:
-                cz = 0 + n[0]
-                cy = yy + n[1]
-                cx = xx + n[2]
-                if self.matrix[cz, cy, cx] <= 0:
-                    if cz == 0:
-                        self.matrix[cz, cy, cx] -= 1
-                    else: 
-                        self.matrix[cz, cy, cx] -= 2
 
     def insert(self, point, x, y, z):
 
@@ -53,7 +44,8 @@ class Matrix(object):
 
     def __str__(self):
 
-        print_matrix = self.remove_zero_layer()
+        # print_matrix = self.remove_zero_layer()
+        print_matrix = self.matrix
 
         s = ""
         for layer in print_matrix:

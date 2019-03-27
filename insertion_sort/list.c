@@ -15,13 +15,14 @@
 struct list {
 
     struct node* head;
-    int count;
+    struct node *tail;
 };
 
 // Necessary structs and variables for node
 struct node {
 
     struct node* next;
+    struct node *previous;
     int val;
 };
 
@@ -34,6 +35,7 @@ struct list* list_init(void) {
         return NULL;
     }
     l->head = NULL;
+    l->tail = NULL;
     return l;
 }
 
@@ -47,6 +49,7 @@ struct node* list_new_node(int num) {
     }
     n->val = num;
     n->next = NULL; 
+    n->previous = NULL;
     return n;
 }
 

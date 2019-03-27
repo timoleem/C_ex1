@@ -1,4 +1,4 @@
-from process_files import import_circuit 
+from process_files import import_circuit, distance_priority, circuits_priority
 from matrix import Matrix
 from circuit import Circuit
 
@@ -10,34 +10,32 @@ import numpy as np
 # netlist = input()
 
 # if file == 'f1':
-# 	f = 'circuit_board_1.xlsx'
+#   f = 'circuit_board_1.xlsx'
 # else: 
-# 	f = 'circuit_board_2.xlsx'
+#   f = 'circuit_board_2.xlsx'
 
 f = 'circuit_board_1.xlsx'
+# f = 'circuit_board_2.xlsx'
 
 x, y, c, n1, n2, n3 = import_circuit(f)
 
-c = Circuit(x, y, c)
-n = n1
+C = Circuit(x, y, c)
+# n = distance_priority(n1, c)
+n = circuits_priority(n1, c)
 
-# if netlist == 'n1':
-# 	n = n1
-# elif netlist == 'n2':
-# 	n = n2
-# else: 
-# 	n = n3
+total_links = len(n)
 
-# print(c)
 i = 1
-
-for index, row in n.iterrows():
-    print(row['first'], row['second'], i)
-    c.set_path(row['first'], row['second'])
-    print(c)
+for x, y in n:
+    print("             NEW                 ")
+    print("---------------------------------")
+    print(x, " -> ", y, "link nr ", i, " of total links ", total_links)
+    C.set_path(x, y)
+    print(C)
     i += 1
+    print("")
 
 # print(c)
-print(c.get_total_cost())
+# print(c.get_total_cost())
 
 

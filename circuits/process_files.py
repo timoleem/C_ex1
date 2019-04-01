@@ -3,6 +3,17 @@ import pandas as pd
 from heapq import heappush, heappop, heapify
 import os
 
+# Timo Leemans
+# 10785612
+
+"""All functions necessary to process the data correctly. I did this quickly
+without taking anything else into account besides just to get it over with. 
+Did not seem like the most important aspect of the exercise.
+
+Furthermore there are some functions to set the priority of the connections.
+"""
+
+# Process the coordinates and put them into a list
 def process_coordinates(df):
 
 	coo_first = df[df["Circuit Board"] == "Gate number"].index.values
@@ -22,7 +33,8 @@ def process_coordinates(df):
 
 	return cor_list
 
-
+# Process the whole excel file, read it with Panda and smoothen the datasets 
+# a little bit. There are some very 'omslachtige manieren' but it does the job
 def import_circuit(file):
 
 	if not os.path.exists(file):
@@ -37,17 +49,13 @@ def import_circuit(file):
 			dimension = df[df["Circuit Board"] == "Dimensions"]['X42 – 2']
 		
 		x, y = dimension.item().split(" x ")
-
 		coordinates = process_coordinates(df)
-
 		index = df.index.values
 
 		nl1_first = df[df["Circuit Board"] == "Netlist 1"].index.values + 1
 		nl1_last = df[df["Circuit Board"] == "Netlist 2"].index.values -1
-
 		nl2_first = df[df["Circuit Board"] == "Netlist 2"].index.values + 1
 		nl2_last = df[df["Circuit Board"] == "Netlist 3"].index.values -1
-
 		nl3_first = df[df["Circuit Board"] == "Netlist 3"].index.values + 1
 		nl3_last = index[-1]
 
@@ -63,6 +71,8 @@ def import_circuit(file):
 
 	return int(x), int(y), coordinates, netlist1, netlist2, netlist3
 
+# Set the priority according to its distance. I did not use this function 
+# in the end but it worked ok as well so I will keep it here. 
 def distance_priority(links, coordinates):
 
 	cor = {}
@@ -82,6 +92,7 @@ def distance_priority(links, coordinates):
 
 	return links
 
+# Helper function to get the distance between to points. 
 def distance(links, coordinates):
 
 	cor = {}
@@ -97,6 +108,10 @@ def distance(links, coordinates):
 
 	return dist
 
+# This worked better. It takes both the distance and the amount of connections
+# one number has into account when putting it into a list. A point with 
+# 5 connections will always be though of as highest priority, then some 
+# priority goes to the distance (the smaller, the higher the priority)
 def circuits_priority(links, coordinates):
 
 	priority = []
@@ -121,9 +136,14 @@ def circuits_priority(links, coordinates):
 
 	return links
 
+# Specific keys that are changed in its direction. 
+def n_c_specific(x, y, change):
 
-
-
+	a, b = change
+	if y == a or y == b:
+		return (y, x)
+	return (x, y)
+		
 
 
 

@@ -28,7 +28,6 @@ struct node {
     char *key;
     // A resizing array, containing the all the integer values for this key
     struct array *value;
-
     // Next pointer
     struct node *next;
 };
@@ -43,19 +42,20 @@ struct node* node_init(char* key, int value) {
     if (a == NULL) {
         return NULL;
     }
-    int array_append_out = array_append(a, value);
-    if (array_append_out == 1) {
+    // Append value to array, if return value 1, free all and return NULL
+    if (array_append(a, value) == 1) {
         free(n);
         free(a);
         return NULL;
     }
     n->value = a;
-    int length = strlen(key)
-    n->key = malloc(sizeof(char) * (strlen(key)));
+    int length = strlen(key);
+    n->key = malloc(sizeof(char) * length + 1);
     if (n->key == NULL) {
         return NULL;
     }
-    strncpy(n->key, key, strlen(key));
+    // strcpy(n->key, key);
+    strncpy(n->key, key, strlen(key)+1);
     n->next = NULL;
     return n;
 }
@@ -64,12 +64,13 @@ struct node* node_init(char* key, int value) {
 struct node *free_node(struct node* n) {
 
     if (n == NULL) {
-        return 1;
+        return NULL;
     }
-    free(n->key);
+    array_cleanup(n->key);
     free(n->value);
     free(n);
-    return 0;
+    puts("Freed node");
+    return n;
 }
 
 /* Create the struct table and assign pointers to it. Returns NULL if failed.*/
@@ -77,16 +78,19 @@ struct table *table_init(unsigned long capacity, double max_load,
                             unsigned long (*hash_func)(unsigned char *)) {
     struct table *table = calloc(1, sizeof(struct table));
     if (table == NULL) {
+        fprintf(stderr, "Allocation error.\n");
+        return NULL;
+    }
+    table->array = calloc(capacity, sizeof(struct node));
+    if (table->array == NULL) {
+        fprintf(stderr, "Allocation error.\n"); 
         return NULL;
     }
     table->capacity = capacity;
     table->load = 0;
     table->max_load = max_load;
     table->hash_func = hash_func;
-    table->array = calloc(capacity, sizeof(struct node));
-    if (table->array == NULL) {
-        return NULL;
-    }
+    puts("Made table \n");
     return table;
 }
 
@@ -131,10 +135,11 @@ int double_size(struct table *t) {
 /* Insert node with key / value to the table. Return 1 if failed. */
 int table_insert(struct table *t, char *key, int value) {
     
+    puts("Attempts insert");
     if (t == NULL && key == NULL) {
         return 1;
     }
-
+    puts("1");
     // load factor = # of elements / # of buckets
     float load_factor = (float) t->load / (float) t->capacity;
 
@@ -142,17 +147,20 @@ int table_insert(struct table *t, char *key, int value) {
     if (load_factor > t->max_load) {
         double_size(t);
     }
-
+    puts("2");
     unsigned long index = t->hash_func((unsigned char *) key) % t->capacity;
     // if node does not exist in hash table, add new node
-    if (t->array == NULL) {
+    if (t->array[index] == NULL) {
         struct node* n = node_init(key, value);
         t->array[index] = n;
         t->load++;
-    }
+        puts("3");        
+    }    
     // else if exists, loop through nodes till you are at the end
     else {
+        puts("4");
         struct node* current = t->array[index];
+        puts("5");
         while (current->next != NULL) {
             current = current->next;
         }
@@ -160,10 +168,32 @@ int table_insert(struct table *t, char *key, int value) {
         current->next = n;
         t->load++;
     }
+    puts("Inserted value");
+    return 0;
 }
 
+
 struct array *table_lookup(struct table *t, char *key) {
-    // ... SOME CODE MISSING HERE ...
+    
+    if (t == NULL && key == NULL) {
+        fprintf(stderr, "No valid key or table \n");
+        return 1;
+    }
+
+    unsigned long index = t->hash_func((unsigned char *) key) % t->capacity;
+
+    if (t->array[index] != NULL) {
+
+        struct node* current = t->array[index];
+
+        while (current) {
+            if (strcmp(current->key, key)) {
+                return current->value;
+            }
+            current = current->next;
+        }
+    }
+    return NULL;
 }
 
 int table_delete(struct table *t, char *key) {
@@ -191,7 +221,6 @@ void table_cleanup(struct table *t) {
                 free_node(current);
                 current = next;
             }
-            
         }
     }
     free(t->array);

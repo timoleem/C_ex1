@@ -19,10 +19,12 @@
 /* test init/cleanup */
 START_TEST (test_init)
 {
+    puts("-------");
     struct table* t;
     t = table_init(2, 0.6, hash_too_simple);
     ck_assert_ptr_nonnull(t);
     table_cleanup(t);
+    puts("-------");
 }
 END_TEST
 
@@ -39,8 +41,9 @@ START_TEST (test_add_basic)
     memcpy(b, "def", sizeof(char) * 4);
     
     ck_assert_int_eq(table_insert(t, a, 3), 0);
+    puts("here 1");
     ck_assert_int_eq(table_insert(t, b, 5), 0);
-    
+    puts("here 2");
     ck_assert_int_eq(array_get(table_lookup(t, a), 0), 3);
     ck_assert_int_eq(array_get(table_lookup(t, b), 0), 5);
     

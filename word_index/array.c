@@ -42,12 +42,9 @@ void array_cleanup(struct array* a) {
  * Return -1 if the index is not a valid position in the array. */
 int array_get(struct array *a, unsigned long index) {
 
-    puts("attempt array get");
     if ((a == NULL) || (index >= a->size) || (a->data == NULL)) {
-        puts("attempt get failed");
         return -1;
     }
-    puts("attempt get succeeded");
     return a->data[index];
 }
 

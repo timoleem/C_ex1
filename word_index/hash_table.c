@@ -85,17 +85,21 @@ int double_size(struct table *t) {
     if (new_table == NULL) {
         return 1;
     }
-    for (i = 0; i < t->capacity; i++) {
+    for (unsigned long i = 0; i < t->capacity; i++) {
 
         // Get first node
-        struct node* current = t->a[i];
+        struct node* current = t->array[i];
         while(current != NULL) {
 
+            unsigned long index = t->hash_func((unsigned char *) key) % t->capacity
+
+            if (t->new_table[index] == NULL) {
+                new_table[index] = current;
+            }
             struct node* next = current->next;
             current->next = NULL;
             current = next;
         }
-
     }
 }
 
@@ -106,6 +110,9 @@ int table_insert(struct table *t, char *key, int value) {
         return 1;
     }
 
+    // if node exists, loop through nodes till you are at the end
+
+    // else if node does not exist in hash table, add new node
 
 
 }

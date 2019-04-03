@@ -81,8 +81,8 @@ int double_size(struct table *t) {
     if (t == NULL) {
         return 1;
     }
-    struct node* new_table = calloc((t->capacity)* 2, sizeof(struct node));
-    if (new_table == NULL) {
+    struct node** new_array = calloc((t->capacity)* 2, sizeof(struct node));
+    if (new_array == NULL) {
         return 1;
     }
     for (unsigned long i = 0; i < t->capacity; i++) {
@@ -91,17 +91,27 @@ int double_size(struct table *t) {
         struct node* current = t->array[i];
         while(current != NULL) {
 
-            unsigned long index = t->hash_func((unsigned char *) key) % t->capacity
+            unsigned long index = t->hash_func((unsigned char *) current->key) % t->capacity;
 
-            if (t->new_table[index] == NULL) {
-                new_table[index] = current;
+            if (new_array[index] == NULL) {
+                new_array[index] = current;
+            }
+            else {
+                struct node* n = new_array[index];
+                while (n->next != NULL) {
+                    n = n->next;
+                }
+                n->next = current;
             }
             struct node* next = current->next;
             current->next = NULL;
             current = next;
         }
     }
-}
+    free(t->array);
+    t->array = new_array;
+    t->capacity = t->capacity * 2;
+}  
 
 /* Insert node with key / value to the table. Return 1 if failed. */
 int table_insert(struct table *t, char *key, int value) {
@@ -110,10 +120,31 @@ int table_insert(struct table *t, char *key, int value) {
         return 1;
     }
 
+    // load factor = # of elements / # of buckets
+    float load_factor = (float) t->load / (float) t->capacity;
+
+    // double allocation space if necessary
+    if (load_factor > t->max_load) {
+        double_size(t);
+    }
+
+    unsigned long index = t->hash_func((unsigned char *) key) % t->capacity;
     // if node exists, loop through nodes till you are at the end
-
+    if (t->array == NULL) {
+        struct node* n = node_init(key, value);
+        t->array[index] = n;
+        t->load++;
+    }
     // else if node does not exist in hash table, add new node
-
+    else {
+        struct node* current = t->array[index];
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        struct node* n = node_init(key, value);
+        current->next = n;
+        t->load++;
+    }
 
 }
 

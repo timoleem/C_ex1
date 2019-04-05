@@ -37,17 +37,18 @@ START_TEST (test_add_basic)
     memcpy(a, "abc", sizeof(char) * 4);
     char *b = malloc(sizeof(char) * 4);
     memcpy(b, "def", sizeof(char) * 4);
-    
+
     ck_assert_int_eq(table_insert(t, a, 3), 0);
     ck_assert_int_eq(table_insert(t, b, 5), 0);
-    
+
     ck_assert_int_eq(array_get(table_lookup(t, a), 0), 3);
     ck_assert_int_eq(array_get(table_lookup(t, b), 0), 5);
-    
+
     table_cleanup(t);
     free(a);
     free(b);
 }
+
 END_TEST
 
 START_TEST (test_lookup_equals)

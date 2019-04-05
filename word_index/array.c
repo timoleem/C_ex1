@@ -1,63 +1,89 @@
 #include <stdlib.h>
-
 #include "array.h"
+
+/*
+Timo Leemans
+10785612
+*/
+
+/*
+This file constructs an array that can get and append keys and values
+inside the array. It multiplies its capacity every time the current size
+exceeds the capacity of the array.*/
 
 // Necessary structs and variables for array
 struct array {
 
-	int* values;
+    unsigned long capacity;
+    unsigned long size;
+    int* data;
 };
 
 /* Initialise an array and return a pointer to it.
  * Return NULL on failure. */
 struct array* array_init(unsigned long initial_capacity) {
-	
-	struct array *a = malloc(sizeof(int) * initial_capacity);
+    
+    // initialise array and assign pointers to it.
+    struct array *a = calloc(1, sizeof(struct array));
     if (a == NULL) {
         return NULL;
     }
+    a->data = calloc(initial_capacity, sizeof(int));
+    if (a->data == NULL) {
+        free(a);
+        return NULL;
+    }
+    a->size = 0;
+    a->capacity = initial_capacity;
     return a;
 }
 
 /* Cleanup array data structure. */
 void array_cleanup(struct array* a) {
 
-	free(a);
+    if (a == NULL) {
+        return;
+    }
+    free(a->data);
+    free(a);
 }
 
 /* Return the element at the index position in the array.
  * Return -1 if the index is not a valid position in the array. */
 int array_get(struct array *a, unsigned long index) {
 
-	// if (index >  a->size) {
-	// 	return -1;
-	// }
-	int element = a->values;
-	return element;
+    if ((a == NULL) || (index >= a->size) || (a->data == NULL)) {
+        return -1;
+    }
+    return a->data[index];
 }
-
-/* Note: Although this operation might require the array to be resized and
- * copied, in order to make room for the added element, it is possible to do
- * this in such a way that the amortized complexity is still O(1).
- * Make sure your code is implemented in such a way to guarantee this. */
 
 /* Add the element at the end of the array.
  * Return 0 if succesful, 1 otherwise. */
 int array_append(struct array *a, int elem) {
     
-	a->values = elem;
-	return 0;
-	// if (a->size++ >  a->capacity) {
- // 		a->capacity *= 2;
- // 		a->values = (int*) realloc(a, sizeof(int) * a->capacity);	
- // 		return 0;		
-	// }    
-	// return 1;
+    if (a == NULL) {
+        return 1;
+    }
+    // if the capacity is exceeded, double the size of the array
+    if (a->size >= a->capacity) { 
+        a->data = (int*) realloc(a->data, sizeof(int) * 2 * a->capacity);
+        if (a->data == NULL) {
+            return 1;
+        }
+        a->capacity = 2 * a->capacity;
+    }
+    // add the element at the end of the array (at index of length array)
+    a->data[array_size(a)] = elem;
+    a->size++;
+    return 0;
 }
 
 /* Return the number of elements in the array */
 unsigned long array_size(struct array *a) {
 
-	int size = sizeof(a)/sizeof(a[0]);
-	return size;
+    if (a == NULL) {
+        return 0;
+    }
+    return a->size;
 }

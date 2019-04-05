@@ -34,7 +34,7 @@ START_TEST (test_add_resize)
     ck_assert_int_eq(table_insert(t, b, 9), 0);
     ck_assert_int_eq(table_insert(t, c, 22), 0);
     ck_assert_int_eq(table_insert(t, d, 17), 0);
-    
+
     ck_assert_int_eq(array_get(table_lookup(t, a), 0), 4);
     ck_assert_int_eq(array_get(table_lookup(t, b), 0), 9);
     ck_assert_int_eq(array_get(table_lookup(t, c), 0), 22);

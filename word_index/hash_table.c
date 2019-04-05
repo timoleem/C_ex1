@@ -5,6 +5,19 @@
 #include "hash_table.h"
 #include "array.h"
 
+/*
+Timo Leemans
+10785612
+*/
+
+/*
+This code creates a table and can insert/delete/lookup nodes inside 
+the table. It furthermore hashes nodes with the same key values. I managed 
+to get till hash_lookup but I was not sure if I had to do any more improving
+in this code instead of in the main.c file to get through that check. 
+*/
+
+
 /* Struct for the table*/
 struct table {
     // The (simple) array used to index the table
@@ -68,7 +81,7 @@ struct node *free_node(struct node* n) {
     if (n == NULL) {
         return NULL;
     }
-    // Free nodes and its pointers 
+    // Free node and its pointers 
     array_cleanup(n->value);
     free(n->key);
     free(n);
@@ -116,7 +129,7 @@ int double_size(struct table *t) {
         // Get first node of the array
         struct node* current = t->array[index];
         while(current != NULL) {
-            // Formula for index is : hash(key) % backing_array_length;
+            // Formula for index is : hash(key) % table capacity (of new array)
             unsigned long index = t->hash_func((unsigned char *) 
                                   current->key) % (t->capacity*2);
             // ... add it to the new array with the same index value
@@ -131,13 +144,16 @@ int double_size(struct table *t) {
                 }
                 n->next = current;
             }
+            // Disconnect old node and continue with the next node 
             struct node* next = current->next;
             current->next = NULL;
             current = next;
         }
     }
+    // Free old table with its arrays and ..
     free(t->array);
     t->array = new_array;
+    // .. set the capacity to twice its former value
     t->capacity = t->capacity*2;
     return 0;
 }  
@@ -159,7 +175,6 @@ int table_insert(struct table *t, char *key, int value) {
     unsigned long index = t->hash_func((unsigned char *) key) % t->capacity;
     // add node to the start if there is none at the specific index
     if (t->array[index] == NULL) {
-
         struct node *n = node_init(key, value);
         t->array[index] = n;
         t->load++;
@@ -167,15 +182,16 @@ int table_insert(struct table *t, char *key, int value) {
     }
     // Else if exists, loop through nodes till you are at the end
     else {
-
         struct node* current = t->array[index];
 
         while (current != NULL) {
+            // If the keys are the same, then add the key to end of the array
             if (!strcmp(current->key, key)) {
                 array_append(current->value, value);
                 t->load++;
                 return 0;
             }
+            // Else point the last node to the the newly initialised key-node
             else if (current->next == NULL) {
                 struct node* n = node_init(key, value);
                 current->next = n;
@@ -228,18 +244,20 @@ int table_delete(struct table *t, char *key) {
     // index = hash(key) % backing_array_length;
     unsigned long index = t->hash_func((unsigned char *) key) % t->capacity;
     
+    // not sure if this is necessary
     if (t->array[index] != NULL) {
-        
+        // If the key index exists, find it in the array
         struct node* current = t->array[index];
         if (current != NULL) {
 
             if (!strcmp(current->key, key)) {
-             
+                // key == first node? Remove node and set next to 1st in array 
                 t->load = t->load - array_size(current->value);
                 t->array[index] = current->next;
                 free_node(current);
                 return 0;
             }
+            // Else search in array till you find it and remove it
             while (current != NULL) {
 
                 if (current->next == NULL) {

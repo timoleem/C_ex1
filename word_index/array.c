@@ -1,6 +1,15 @@
 #include <stdlib.h>
-
 #include "array.h"
+
+/*
+Timo Leemans
+10785612
+*/
+
+/*
+This file constructs an array that can get and append keys and values
+inside the array. It multiplies its capacity every time the current size
+exceeds the capacity of the array.*/
 
 // Necessary structs and variables for array
 struct array {
@@ -14,6 +23,7 @@ struct array {
  * Return NULL on failure. */
 struct array* array_init(unsigned long initial_capacity) {
     
+    // initialise array and assign pointers to it.
     struct array *a = calloc(1, sizeof(struct array));
     if (a == NULL) {
         return NULL;
@@ -55,6 +65,7 @@ int array_append(struct array *a, int elem) {
     if (a == NULL) {
         return 1;
     }
+    // if the capacity is exceeded, double the size of the array
     if (a->size >= a->capacity) { 
         a->data = (int*) realloc(a->data, sizeof(int) * 2 * a->capacity);
         if (a->data == NULL) {
@@ -62,6 +73,7 @@ int array_append(struct array *a, int elem) {
         }
         a->capacity = 2 * a->capacity;
     }
+    // add the element at the end of the array (at index of length array)
     a->data[array_size(a)] = elem;
     a->size++;
     return 0;

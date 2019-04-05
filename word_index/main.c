@@ -18,6 +18,17 @@
 #define MAX_TESTS 2
 #define HASH_TESTS 1
 
+/*
+Timo Leemans
+10785612
+*/
+
+/*
+This file contains functions to read the text inside the file 
+lookup origin-of-species-ascii.txt and to insert all the words inside the 
+hash_table. I did not get to finish this unfortunately, I was already surprised
+I managed to finish the hash_table :)
+*/
 
 /* Creates a hash table with word index for the specified file and parameters */
 struct table *create_from_file(char *filename, unsigned long start_size,
@@ -28,13 +39,17 @@ struct table *create_from_file(char *filename, unsigned long start_size,
 
     char *line = malloc((LINE_LENGTH + 1) * sizeof(char));
     
+    // Create the hash table with its properties
     struct table *hash_table; 
     hash_table = table_init(start_size, max_load, hash_func);
+    
     if (hash_table == NULL) {
         fprintf(stderr, "Failed to create hash table");
         return 1;
     }
-    puts("HERE");
+
+    // Read the lines (only lowercase alphabetic letters) and add them to the
+    // hash table. 
     while (fgets(line, LINE_LENGTH, fp)) {
 
         for (unsigned int i = 0; i < strlen(line); i++) {
@@ -44,11 +59,13 @@ struct table *create_from_file(char *filename, unsigned long start_size,
             else if (line[i] < 'a' || line[i] > 'z') {
                 line[i] = (char)tolower(line[i]);
             }
-        // Following add every word to the hash table, I did not get
-        // to finish it unfortunately and I decided to stop here to prevent
-        // myself from introducing weird errors that would only reduce
-        // the grade. 
         }
+
+        /* Following add every word to the hash table, I did not get
+        to finish it unfortunately and I decided to stop here to prevent
+        myself from introducing weird errors that would only reduce
+        the grade. The above works (ONLY lowercase alphabetic letters) but
+        I did not get to test it.. */     
     }
     fclose(fp);
     free(line);
@@ -111,4 +128,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-

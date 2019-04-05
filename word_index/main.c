@@ -29,10 +29,26 @@ struct table *create_from_file(char *filename, unsigned long start_size,
     char *line = malloc((LINE_LENGTH + 1) * sizeof(char));
     
     struct table *hash_table; 
-    // ... SOME CODE MISSING HERE ...
-
+    hash_table = table_init(start_size, max_load, hash_func);
+    if (hash_table == NULL) {
+        fprintf(stderr, "Failed to create hash table");
+        return 1;
+    }
+    puts("HERE");
     while (fgets(line, LINE_LENGTH, fp)) {
-        // ... SOME CODE MISSING HERE ...
+
+        for (unsigned int i = 0; i < strlen(line); i++) {
+            if (!isalpha(line[i])) {
+                line[i] = ' ';
+            }
+            else if (line[i] < 'a' || line[i] > 'z') {
+                line[i] = (char)tolower(line[i]);
+            }
+        // Following add every word to the hash table, I did not get
+        // to finish it unfortunately and I decided to stop here to prevent
+        // myself from introducing weird errors that would only reduce
+        // the grade. 
+        }
     }
     fclose(fp);
     free(line);

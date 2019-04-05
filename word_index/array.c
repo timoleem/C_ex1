@@ -55,7 +55,6 @@ int array_append(struct array *a, int elem) {
     if (a == NULL) {
         return 1;
     }
-
     if (a->size >= a->capacity) { 
         a->data = (int*) realloc(a->data, sizeof(int) * 2 * a->capacity);
         if (a->data == NULL) {

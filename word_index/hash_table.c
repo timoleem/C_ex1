@@ -69,8 +69,8 @@ struct node *free_node(struct node* n) {
         return NULL;
     }
     // Free nodes and its pointers 
-    array_cleanup(n->key);
-    free(n->value);
+    array_cleanup(n->value);
+    free(n->key);
     free(n);
     return n;
 }
@@ -112,12 +112,13 @@ int double_size(struct table *t) {
         return 1;
     }
     // For each index in the the table. 
-    for (unsigned long i = 0; i < t->capacity; i++) {
+    for (unsigned long index = 0; index < t->capacity; index++) {
         // Get first node of the array
-        struct node* current = t->array[i];
+        struct node* current = t->array[index];
         while(current != NULL) {
-            // Get the index value of the current key and ...
-            unsigned long index = t->hash_func((unsigned char *) current->key) % t->capacity;
+            // Formula for index is : hash(key) % backing_array_length;
+            unsigned long index = t->hash_func((unsigned char *) 
+                                  current->key) % (t->capacity*2);
             // ... add it to the new array with the same index value
             if (new_array[index] == NULL) {
                 new_array[index] = current;
@@ -137,7 +138,7 @@ int double_size(struct table *t) {
     }
     free(t->array);
     t->array = new_array;
-    t->capacity = t->capacity * 2;
+    t->capacity = t->capacity*2;
     return 0;
 }  
 
@@ -154,24 +155,37 @@ int table_insert(struct table *t, char *key, int value) {
     if (load_factor > t->max_load) {
         double_size(t);
     }
+    // Formula for index is : hash(key) % backing_array_length;
     unsigned long index = t->hash_func((unsigned char *) key) % t->capacity;
-    // If node does not exist in hash table, add new node
+    // add node to the start if there is none at the specific index
     if (t->array[index] == NULL) {
-        struct node* n = node_init(key, value);
+
+        struct node *n = node_init(key, value);
         t->array[index] = n;
         t->load++;
-    }    
+        return 0;
+    }
     // Else if exists, loop through nodes till you are at the end
     else {
+
         struct node* current = t->array[index];
-        while (current->next != NULL) {
+
+        while (current != NULL) {
+            if (!strcmp(current->key, key)) {
+                array_append(current->value, value);
+                t->load++;
+                return 0;
+            }
+            else if (current->next == NULL) {
+                struct node* n = node_init(key, value);
+                current->next = n;
+                t->load++;
+                return 0;
+            }
             current = current->next;
         }
-        struct node* n = node_init(key, value);
-        current->next = n;
-        t->load++;
     }
-    return 0;
+    return 1;
 }
 
 /* Look up the key in the table and return the value assigned to it. First
@@ -179,18 +193,23 @@ look up the index of the key, then retrieve the node in the hash array. If it
 fails, return NULL. */
 struct array *table_lookup(struct table *t, char *key) {
     
-    if (t == NULL && key == NULL) {
+    // puts("START LOOKUP \n");
+    if (t == NULL || key == NULL) {
         fprintf(stderr, "Key or table does not exist! \n");
         return 1;
     }
-
-    // Get the index value of the key in the table
+    // Formula for index is : hash(key) % backing_array_length;
     unsigned long index = t->hash_func((unsigned char *) key) % t->capacity;
+
+    // if (t->array[index+1] != NULL) {
+    //     index++;
+    // }
+
     if (t->array[index] != NULL) {
         // if it exists, search in the hash array for the node and its value.
         struct node* current = t->array[index];
         while (current) {
-            if (strcmp(current->key, key)) {
+            if (!strcmp(current->key, key)) {
                 return current->value;
             }
             current = current->next;
@@ -199,8 +218,45 @@ struct array *table_lookup(struct table *t, char *key) {
     return NULL;
 }
 
+/* Delete the node with key from the table. If succeeded, return 0, and if not, 
+return 1*/
 int table_delete(struct table *t, char *key) {
-    // ... SOME CODE MISSING HERE ...
+    
+    if (t == NULL || key == NULL) {
+        return 1;
+    }
+    // index = hash(key) % backing_array_length;
+    unsigned long index = t->hash_func((unsigned char *) key) % t->capacity;
+    
+    if (t->array[index] != NULL) {
+        
+        struct node* current = t->array[index];
+        if (current != NULL) {
+
+            if (!strcmp(current->key, key)) {
+             
+                t->load = t->load - array_size(current->value);
+                t->array[index] = current->next;
+                free_node(current);
+                return 0;
+            }
+            while (current != NULL) {
+
+                if (current->next == NULL) {
+                    fprintf(stderr, "Couldn't find key\n");
+                    return 1;
+                }
+                if (!strcmp(current->next->key, key)) {
+                    struct node* remove = current->next;
+                    current->next = remove->next;
+                    t->load = t->load - array_size(remove->value);
+                    free_node(remove);
+                    return 0;
+                }
+                current = current->next;
+            }
+        }
+    }
 }
 
 /* Clean the table and its arrays by index. If there are multiple nodes in 
@@ -217,8 +273,8 @@ void table_cleanup(struct table *t) {
         return;
     }
     // if table contains arrays, free all nodes in all arrays along with array.
-    for (long unsigned i = 0; i < t->capacity; i++) {
-        if (t->array[i]) {
+    for (unsigned long i = 0; i < t->capacity; i++) {
+        if (t->array[i] != NULL) {
             struct node* current = t->array[i];
             while (current) {
                 struct node* next = current->next;
